@@ -1,2 +1,46 @@
-sto cazzooooooo
-	
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Distribution</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .output {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Random Distribution Generator</h1>
+
+    <button onclick="generateRandomDistribution()">Generate Random Distribution</button>
+
+    <div class="output" id="output"></div>
+
+    <script>
+        function generateRandomDistribution() {
+            // Space M is represented as an array of 10 points between 0 and 1.
+            let M = Array.from({length: 10}, () => Math.random().toFixed(3));
+            
+            // Display the distribution in the output div
+            document.getElementById('output').innerHTML = 'Random Distribution over M: ' + M.join(', ');
+        }
+    </script>
+
+</body>
+</html>
+
