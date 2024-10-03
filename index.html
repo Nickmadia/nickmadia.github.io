@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Distribution</title>
+    <title>Random Distribution Graph</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin-top: 100px;
+            margin-top: 50px;
         }
 
         button {
@@ -19,9 +19,13 @@
 
         .output {
             margin-top: 20px;
-            font-size: 18px;
+        }
+
+        canvas {
+            margin-top: 40px;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -31,13 +35,52 @@
 
     <div class="output" id="output"></div>
 
+    <!-- Canvas for displaying the graph -->
+    <canvas id="distributionChart" width="400" height="200"></canvas>
+
     <script>
+        let chart;
+
         function generateRandomDistribution() {
-            // Space M is represented as an array of 10 points between 0 and 1.
-            let M = Array.from({length: 10}, () => Math.random().toFixed(3));
-            
+            // Space M is represented as an array of 10 random points between 0 and 1.
+            let M = Array.from({ length: 10 }, () => Math.random().toFixed(3));
+
             // Display the distribution in the output div
             document.getElementById('output').innerHTML = 'Random Distribution over M: ' + M.join(', ');
+
+            // Prepare data for the chart
+            const labels = Array.from({ length: 10 }, (_, i) => 'Point ' + (i + 1));
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'Random Distribution',
+                    data: M,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            };
+
+            const config = {
+                type: 'line',  // Can also be 'bar' for bar chart
+                data: data,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            };
+
+            // If a chart already exists, destroy it before creating a new one
+            if (chart) {
+                chart.destroy();
+            }
+
+            // Create a new chart
+            const ctx = document.getElementById('distributionChart').getContext('2d');
+            chart = new Chart(ctx, config);
         }
     </script>
 
