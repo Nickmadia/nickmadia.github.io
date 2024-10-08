@@ -1,0 +1,127 @@
+/* General Styling */
+html, body {
+    height: 100%; /* Ensure full height for body and html */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #0d0d0d, #1a1a1a); /* Dark gradient */
+    color: #e0e0e0;
+}
+
+header {
+    background: #000;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #5a189a;
+}
+
+h1 {
+    margin: 0;
+    font-size: 36px;
+    color: #f72585; /* Neon pink */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+main {
+    flex: 1; /* Allow main content to grow and push footer down */
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #111;
+    border-radius: 15px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
+}
+
+/* Homework List Styling */
+ul.homework-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+}
+
+ul.homework-list li {
+    margin: 15px 0;
+    transition: transform 0.2s ease;
+}
+
+ul.homework-list li:hover {
+    transform: scale(1.05);
+}
+
+ul.homework-list a {
+    text-decoration: none;
+    color: #f72585; /* Neon pink links */
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+ul.homework-list a:hover {
+    color: #7209b7; /* Neon purple hover */
+}
+
+/* Latest Homework Preview Styling */
+.latest-preview {
+    flex: 1;
+    background: #1b1b1b; /* Dark grey */
+    padding: 20px;
+    margin-left: 40px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+    transition: background-color 0.3s ease;
+}
+
+.latest-preview:hover {
+    background: #262626; /* Hover effect */
+}
+
+.latest-preview h2 {
+    font-size: 28px;
+    color: #f72585; /* Neon pink */
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.latest-preview h3 {
+    font-size: 24px;
+    color: #7209b7; /* Neon purple */
+}
+
+.latest-preview p {
+    font-size: 18px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: #ddd;
+}
+
+.latest-preview a {
+    display: inline-block;
+    padding: 10px 20px;
+    color: #fff;
+    background: #5a189a; /* Neon purple */
+    border-radius: 5px;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.latest-preview a:hover {
+    background: #f72585; /* Neon pink hover */
+}
+
+footer {
+    background: #000;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    border-top: 1px solid #5a189a;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}

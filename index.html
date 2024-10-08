@@ -3,87 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Distribution Graph</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .output {
-            margin-top: 20px;
-        }
-
-        canvas {
-            margin-top: 40px;
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Statistics Homework</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <header>
+        <h1>Statistics Homework List</h1>
+    </header>
 
-    <h1>Random Distribution Generator</h1>
+    <main>
+        <ul class="homework-list">
+            <li><a href="homework1.html">Homework 1: Basic Statistical Concepts</a></li>
+            <li><a href="homeworks/homework2.html">Homework 2</a></li>
+        </ul>
 
-    <button onclick="generateRandomDistribution()">Generate Random Distribution</button>
+        <div class="latest-preview">
+            <h2>Latest Completed Homework</h2>
+            <h3 id="latest-title">Loading...</h3>
+            <p id="latest-description">Loading...</p>
+            <a href="#" id="latest-link" class="view-more">View Latest Homework</a>
+        </div>
+    </main>
 
-    <div class="output" id="output"></div>
-
-    <!-- Canvas for displaying the graph -->
-    <canvas id="distributionChart" width="400" height="200"></canvas>
+    <footer>
+        <p>&copy; 2024 My Statistics Blog</p>
+    </footer>
 
     <script>
-        let chart;
+        // Homework metadata (link to files)
+        const homeworkList = [
+            { title: "Homework 1", file: "homework1" },
+            
+        ];
 
-        function generateRandomDistribution() {
-            // Space M is represented as an array of 10 random points between 0 and 1.
-            let M = Array.from({ length: 10 }, () => Math.random().toFixed(3));
-
-            // Display the distribution in the output div
-            document.getElementById('output').innerHTML = 'Random Distribution over M: ' + M.join(', ');
-
-            // Prepare data for the chart
-            const labels = Array.from({ length: 10 }, (_, i) => 'Point ' + (i + 1));
-            const data = {
-                labels: labels,
-                datasets: [{
-                    label: 'Random Distribution',
-                    data: M,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            };
-
-            const config = {
-                type: 'line',  // Can also be 'bar' for bar chart
-                data: data,
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            };
-
-            // If a chart already exists, destroy it before creating a new one
-            if (chart) {
-                chart.destroy();
+        // Function to fetch the description from the latest homework file
+        async function getHomeworkDescription(file) {
+            try {
+                const response = await fetch(file);
+                const text = await response.text();
+                // Look for <p id="description"> tag in the HTML file
+                const descriptionMatch = text.match(/<p id="description">(.*?)<\/p>/);
+                return descriptionMatch ? descriptionMatch[1] : "No description available.";
+            } catch (error) {
+                console.error('Error fetching homework file:', error);
+                return "Failed to load description.";
             }
-
-            // Create a new chart
-            const ctx = document.getElementById('distributionChart').getContext('2d');
-            chart = new Chart(ctx, config);
         }
-    </script>
 
+        // Function to find and display the latest homework
+        async function updateLatestPreview() {
+            const latestHomework = homeworkList[homeworkList.length - 1]; // Assume last in list is the latest
+
+            document.getElementById('latest-title').textContent = latestHomework.title;
+            document.getElementById('latest-link').href = latestHomework.file;
+
+            const description = await getHomeworkDescription(latestHomework.file);
+            document.getElementById('latest-description').textContent = description;
+        }
+
+        // Call the function when the page loads
+        updateLatestPreview();
+    </script>
 </body>
 </html>
-
