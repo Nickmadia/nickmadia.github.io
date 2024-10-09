@@ -15,7 +15,12 @@
         }
         .flipped-chart {
             transform: rotate(90deg); /* Flips the chart by 90 degrees clockwise */
-        } 
+        }  pre {
+            background-color: #f4f4f409; /* Light gray background */
+            padding: 10px; /* Padding for the code */
+            border-radius: 5px; /* Rounded corners */
+            overflow-x: auto; /* Scrollable if too long */
+        }
     </style>
 </head>
 <body>
@@ -32,8 +37,8 @@
             <ul>
                 <li><strong>Population</strong>: The entire set of items or individuals being studied.</li>
                 <li><strong>Statistical Units</strong>: The individual items or individuals being analyzed.</li>
-                <li><strong>Distribution</strong>: How values are spread or dispersed across the population or sample.</li>
-                <li><strong>Frequency</strong>: 
+                <li><strong>Distribution</strong>: A distribution in statistics refers to the way in which the values of a random variable or a set of data are spread or arranged. It describes the probabilities or frequencies of the possible outcomes of a variable. Distributions provide insights into the characteristics of the data, such as its central tendency, variability, and overall shape.</li>
+                <li><strong>Frequency</strong>: Frequency in statistics refers to the number of times a particular value or category appears in a dataset. It is a way to quantify how often each value occurs, helping to summarize and analyze the distribution of data. 
                     <ul>
                         <li><strong>Absolute Frequency</strong>: The number of times a particular value occurs in the dataset.</li>
                         <li><strong>Relative Frequency</strong>: The ratio of the absolute frequency to the total number of observations.</li>
@@ -51,11 +56,85 @@
 
             <p>To address these issues, Donald Knuth proposed more stable numerical algorithms for computing the mean, such as using pairwise summation or compensating for the floating-point errors.</p>
 
+            <h3>Knuth's Algorithm</h3>
+            <p>
+                The <strong>Knuth stable numerical algorithm</strong>, also known as <strong>Knuth's Algorithm</strong> for computing the <strong>mean</strong> and <strong>variance</strong> of a dataset, aims to provide stable numerical methods that reduce the risk of numerical errors, especially when dealing with floating-point arithmetic.
+            </p>
+            <p>
+                <strong>Advantages of Knuth's Algorithm</strong>:
+                <ul>
+                    <li><strong>Numerical Stability</strong>: Reduces the effect of floating-point errors that can occur when directly computing the mean and variance.</li>
+                    <li><strong>Single Pass</strong>: Computes mean and variance in a single pass through the data, making it efficient for large datasets.</li>
+                </ul>
+            </p>
+         
+            <p>
+                <strong>Conclusion</strong>: Knuth's stable numerical algorithm effectively computes the mean and variance while minimizing the effects of numerical instability, making it a valuable method for statistical analysis, especially in computational applications.
+            </p>
+            
            <!-- Practice Section -->
            <h2>Practice</h2>
            <h3>Penetration Simulation</h3>
            <p>We have <strong>n</strong> servers and <strong>m</strong> attackers. The probability of each attacker successfully penetrating a server is <strong>p</strong>. The goal is to visualize the penetration attempts and compute statistical measures.</p>
-           
+        <p>The simulation is obtained by running this code snippet (which is also visible from source):
+           <pre> <code >
+function runSimulation() {
+           const n = parseInt(document.getElementById('servers').value);
+           const m = parseInt(document.getElementById('attackers').value);
+           const p = parseFloat(document.getElementById('probability').value);
+
+           const results = [];
+           const lineData = [];
+
+           // Run simulation for each attacker
+           for (let i = 0; i < m; i++) {
+               let penetrations = 0;
+               const penetrationSeries = [0]; // Start from 0 for cumulative count
+
+               // Simulate each attacker's attempt on each server
+               for (let j = 0; j < n; j++) {
+                   const success = Math.random() < p ? 1 : 0;
+                   penetrations += success;
+                   penetrationSeries.push(penetrations); // Increment by 1 if successful
+               }
+
+               // Store penetration count and series data
+               results.push(penetrations);
+               lineData.push(penetrationSeries);
+           }
+           // Update both charts
+           updateLineChart(lineData, n);
+           updateDistributionChart(results, n);
+            </code></pre>
+        </p>
+<p>
+    The mean and the standard deviation are obtained using the knuth's algorithm:
+    <pre>
+        <code>
+            // Knuth's Algorithm for Mean Calculation (more numerically stable)
+       function knuthMeanVariance(arr) {
+        let mean = 0;
+        let M2 = 0; 
+        let N = 0; 
+
+        for (let x of arr) {
+            N += 1;
+            const delta = x - mean;
+            mean += delta / N;
+            M2 += delta * (x - mean);
+        }
+
+        const variance = N > 1 ? M2 / (N - 1) : 0; // Sample variance; use N for population variance
+        const standardDeviation = Math.sqrt(variance);
+
+        return {
+            mean: mean,
+            variance: variance,
+            standardDeviation: standardDeviation,
+        };
+        </code>
+    </pre>
+</p>
            <!-- Input form -->
            <form id="inputForm">
                <label for="servers">Number of servers (n):</label>
@@ -125,8 +204,9 @@
            updateDistributionChart(results, n);
 
            // Calculate and display statistics using Knuth's algorithm
-           const mean = knuthMean(results);
-           const stdDev = calculateStandardDeviation(results, mean);
+           const res = knuthMeanVariance(results);
+           const mean = res.mean;
+           const stdDev = res.standardDeviation;
            const mode = calculateMode(results);
 
            document.getElementById('mean').textContent = mean.toFixed(2);
@@ -208,19 +288,27 @@
        }
 
        // Knuth's Algorithm for Mean Calculation (more numerically stable)
-       function knuthMean(arr) {
-           let mean = 0;
-           for (let i = 0; i < arr.length; i++) {
-               mean += (arr[i] - mean) / (i + 1);
-           }
-           return mean;
-       }
+       function knuthMeanVariance(arr) {
+        let mean = 0;
+        let M2 = 0; 
+        let N = 0; 
 
-       function calculateStandardDeviation(arr, mean) {
-           const squaredDiffs = arr.map(value => (value - mean) ** 2);
-           const avgSquaredDiff = knuthMean(squaredDiffs);
-           return Math.sqrt(avgSquaredDiff);
-       }
+        for (let x of arr) {
+            N += 1;
+            const delta = x - mean;
+            mean += delta / N;
+            M2 += delta * (x - mean);
+        }
+
+        const variance = N > 1 ? M2 / (N - 1) : 0; // Sample variance; use N for population variance
+        const standardDeviation = Math.sqrt(variance);
+
+        return {
+            mean: mean,
+            variance: variance,
+            standardDeviation: standardDeviation,
+        };
+} 
 
        function calculateMode(arr) {
            const frequencyMap = {};
