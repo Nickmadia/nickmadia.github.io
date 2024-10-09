@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homework 1: Basic Statistical Concepts</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- For graphs --> 
+    <style>
+       .charts-container {
+            display: flex;
+        }
+        .chart-wrapper {
+            flex: 1;
+        }
+        .flipped-chart {
+            transform: rotate(90deg); /* Flips the chart by 90 degrees clockwise */
+        } 
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Homework #1</h1>
+    </header>
+
+    <main>
+        <!-- Theory Section -->
+        <section id="hm1">
+            <h2>Theory</h2>
+            <h3 id="description">Basic Notions in Statistics</h3>
+            <p>In statistics, we often work with the following concepts:</p>
+            <ul>
+                <li><strong>Population</strong>: The entire set of items or individuals being studied.</li>
+                <li><strong>Statistical Units</strong>: The individual items or individuals being analyzed.</li>
+                <li><strong>Distribution</strong>: How values are spread or dispersed across the population or sample.</li>
+                <li><strong>Frequency</strong>: 
+                    <ul>
+                        <li><strong>Absolute Frequency</strong>: The number of times a particular value occurs in the dataset.</li>
+                        <li><strong>Relative Frequency</strong>: The ratio of the absolute frequency to the total number of observations.</li>
+                        <li><strong>Percentage Frequency</strong>: The relative frequency expressed as a percentage.</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Arithmetic Average (Mean)</h3>
+            <p>The arithmetic average is calculated as the sum of all values divided by the number of values. It’s a simple measure of central tendency, but issues arise in computation:</p>
+            <ul>
+                <li><strong>Floating Point Representation:</strong> Due to the way computers handle floating-point numbers, rounding errors can accumulate, especially when summing large sequences of numbers.</li>
+                <li><strong>Catastrophic Cancellation:</strong> Occurs when subtracting two nearly equal numbers, leading to significant loss of precision.</li>
+            </ul>
+
+            <p>To address these issues, Donald Knuth proposed more stable numerical algorithms for computing the mean, such as using pairwise summation or compensating for the floating-point errors.</p>
+
+           <!-- Practice Section -->
+           <h2>Practice</h2>
+           <h3>Penetration Simulation</h3>
+           <p>We have <strong>n</strong> servers and <strong>m</strong> attackers. The probability of each attacker successfully penetrating a server is <strong>p</strong>. The goal is to visualize the penetration attempts and compute statistical measures.</p>
+           
+           <!-- Input form -->
+           <form id="inputForm">
+               <label for="servers">Number of servers (n):</label>
+               <input type="number" id="servers" name="servers" min="1" value="25" required><br>
+
+               <label for="attackers">Number of attackers (m):</label>
+               <input type="number" id="attackers" name="attackers" min="1" value="50" required><br>
+
+               <label for="probability">Probability of penetration (p):</label>
+               <input type="number" id="probability" name="probability" min="0" max="1" step="0.01" value="0.5" required><br>
+
+               <button type="button" onclick="runSimulation()">Run Simulation</button>
+           </form>
+
+           <!-- Charts for visualizing results -->
+           <div class="charts-container" >
+               <div class="chart-wrapper">
+                   <canvas id="penetrationLineChart" height="250"></canvas>
+               </div>
+               <div class="chart-wrapper">
+                   <canvas id="penetrationDistributionChart" height="250"></canvas>
+               </div>
+           </div>
+
+           <!-- Panel for statistical results -->
+           <div id="statisticsPanel" class="centered-div">
+               <h3>Statistics</h3>
+               <p><strong>Mean:</strong> <span id="mean">N/A</span></p>
+               <p><strong>Standard Deviation:</strong> <span id="stdDev">N/A</span></p>
+               <p><strong>Mode:</strong> <span id="mode">N/A</span></p>
+           </div>
+       </section>
+   </main>
+
+   <footer>
+       <p>&copy; 2024 My Statistics Blog</p>
+   </footer>
+
+   <script>
+       function runSimulation() {
+           const n = parseInt(document.getElementById('servers').value);
+           const m = parseInt(document.getElementById('attackers').value);
+           const p = parseFloat(document.getElementById('probability').value);
+
+           const results = [];
+           const lineData = [];
+
+           // Run simulation for each attacker
+           for (let i = 0; i < m; i++) {
+               let penetrations = 0;
+               const penetrationSeries = [0]; // Start from 0 for cumulative count
+
+               // Simulate each attacker's attempt on each server
+               for (let j = 0; j < n; j++) {
+                   const success = Math.random() < p ? 1 : 0;
+                   penetrations += success;
+                   penetrationSeries.push(penetrations); // Increment by 1 if successful
+               }
+
+               // Store penetration count and series data
+               results.push(penetrations);
+               lineData.push(penetrationSeries);
+           }
+
+           // Update both charts
+           updateLineChart(lineData, n);
+           updateDistributionChart(results, n);
+
+           // Calculate and display statistics using Knuth's algorithm
+           const mean = knuthMean(results);
+           const stdDev = calculateStandardDeviation(results, mean);
+           const mode = calculateMode(results);
+
+           document.getElementById('mean').textContent = mean.toFixed(2);
+           document.getElementById('stdDev').textContent = stdDev.toFixed(2);
+           document.getElementById('mode').textContent = mode;
+       }
+
+       function updateLineChart(lineData, n) {
+           const ctx = document.getElementById('penetrationLineChart').getContext('2d');
+           const labels = Array.from({ length: n + 1 }, (_, i) => `${i}`);
+           console.log(lineData);
+           const datasets = lineData.map((data, index) => ({
+               label: `Attacker ${index + 1}`,
+               data: data.map((value, i) => ({ x: i, y: value })), // Properly map x and y
+               fill: false,
+               borderColor: `rgba(${Math.floor(Math.random() * 255)}, 0, 255, 0.7)`,
+               stepped: true, // This makes the line flat until a jump
+           }));
+
+           if (window.penetrationLineChart instanceof Chart) {
+        window.penetrationLineChart.destroy();
+    }
+                      window.penetrationLineChart = new Chart(ctx, {
+               type: 'line',
+               data: { labels: labels, datasets: datasets },
+               options: {
+                   scales: {
+                      
+                    y: { 
+                    min: 0, // Always start the y-axis from 0
+                    max: n, // Set the y-axis maximum to the number of servers
+                    beginAtZero: true // Always display 0 even if no data reaches it
+                } 
+                   } ,
+            plugins: {
+                legend: {
+                    display: false // Disable the legend
+                }
+            
+               }
+           }});
+       }
+
+       function updateDistributionChart(results, n) {
+           const ctx = document.getElementById('penetrationDistributionChart').getContext('2d');
+           const frequencies = new Array(n + 1).fill(0);
+           results.forEach(r => frequencies[r]++);
+
+           const labels = Array.from({ length: n + 1 }, (_, i) => i.toString());
+
+           if (window.penetrationDistributionChart instanceof Chart) {
+        window.penetrationDistributionChart.destroy();
+    } 
+
+           window.penetrationDistributionChart = new Chart(ctx, {
+               type: 'bar',
+               data: {
+                   labels: labels,
+                   datasets: [{
+                       label: 'Number of Attackers',
+                       data: frequencies,
+                       backgroundColor:Array.from({ length: n }, () => 
+                       `rgba(${Math.floor(Math.random() * 255)}, 0, 255, 0.7)`), 
+                   }]
+               },
+               options: {
+                   indexAxis: 'y', // Align bars with attackers
+                   scales: {
+                       x: { beginAtZero: true },
+                       y: { reverse: true, display:false}
+                   },   
+            plugins: {
+                legend: {
+                    display: false // Disable the legend
+                }
+            },
+               }
+           });
+       }
+
+       // Knuth's Algorithm for Mean Calculation (more numerically stable)
+       function knuthMean(arr) {
+           let mean = 0;
+           for (let i = 0; i < arr.length; i++) {
+               mean += (arr[i] - mean) / (i + 1);
+           }
+           return mean;
+       }
+
+       function calculateStandardDeviation(arr, mean) {
+           const squaredDiffs = arr.map(value => (value - mean) ** 2);
+           const avgSquaredDiff = knuthMean(squaredDiffs);
+           return Math.sqrt(avgSquaredDiff);
+       }
+
+       function calculateMode(arr) {
+           const frequencyMap = {};
+           arr.forEach(value => {
+               if (frequencyMap[value]) {
+                   frequencyMap[value]++;
+               } else {
+                   frequencyMap[value] = 1;
+               }
+           });
+
+           let mode = null;
+           let maxCount = 0;
+           for (const [key, value] of Object.entries(frequencyMap)) {
+               if (value > maxCount) {
+                   maxCount = value;
+                   mode = key;
+               }
+           }
+           return mode;
+       }
+   </script>
+</body>
+</html>

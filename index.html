@@ -8,13 +8,12 @@
 </head>
 <body>
     <header>
-        <h1>Statistics Homework List</h1>
+        <h1>Statistics Homeworks</h1>
     </header>
 
     <main>
         <ul class="homework-list">
-            <li><a href="homework1.html">Homework 1: Basic Statistical Concepts</a></li>
-            <li><a href="homeworks/homework2.html">Homework 2</a></li>
+            <li><a href="homeworks/homework1.html">Homework #1</a></li>
         </ul>
 
         <div class="latest-preview">
@@ -32,7 +31,7 @@
     <script>
         // Homework metadata (link to files)
         const homeworkList = [
-            { title: "Homework 1", file: "homework1" },
+            { title: "Homework 1", file: "homework1.html" },
             
         ];
 
@@ -42,7 +41,9 @@
                 const response = await fetch(file);
                 const text = await response.text();
                 // Look for <p id="description"> tag in the HTML file
-                const descriptionMatch = text.match(/<p id="description">(.*?)<\/p>/);
+                    console.log(te);
+                                    const descriptionMatch = text.match(/<p\s+id="description"\s*>(.*?)<\/p>/);
+
                 return descriptionMatch ? descriptionMatch[1] : "No description available.";
             } catch (error) {
                 console.error('Error fetching homework file:', error);

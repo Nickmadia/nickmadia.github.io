@@ -19,7 +19,7 @@ header {
 h1 {
     margin: 0;
     font-size: 36px;
-    color: #f72585; /* Neon pink */
+    color: #8a1e76; /* Neon pink */
     text-transform: uppercase;
     letter-spacing: 2px;
 }
@@ -125,3 +125,4 @@ footer {
     bottom: 0;
     width: 100%;
 }
+
