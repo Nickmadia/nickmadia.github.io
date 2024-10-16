@@ -3,8 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homework 2</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Homework 2: Random Walk, Variance and Standard deviation</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .charts-container {
+            display: flex;
+            margin: 0;
+        }
+        .chart-wrapper {
+            flex: 1;
+        }
+        .flipped-chart {
+            transform: rotate(90deg); /* Flips the chart by 90 degrees clockwise */
+        }  pre {
+            background-color: #f4f4f409; /* Light gray background */
+            padding: 10px; /* Padding for the code */
+            border-radius: 5px; /* Rounded corners */
+            overflow-x: auto; /* Scrollable if too long */
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -14,22 +32,235 @@
     <main>
         <section>
             <h2>Title</h2>
-            <p></p>
-        </section>
+            <h3>Random walk, Variance and Standard Deviation</h3>
+            <p>
+              bla bla stuff a;sdlkfj as;dlfkj as;ldfkja;slkdjf;asl df;alsdkj f;alskjdf;laskjdf;lkasjdf; alskjfd;alksjdf;lkasjdf;lkajs f
+              The arithmetic average is calculated as the sum of all values divided by the number of values. It’s a simple measure of central tendency, but issues arise in computation:
+            </p>
+            <ul>
+                <li>ligma</li>
+                <li>ligma</li>
+                <li>ligma</li>
+            </ul>
 
-        <section>
             <h2>Research</h2>
             <p></p>
-        </section>
 
-        <section>
             <h2>Code</h2>
             <pre></pre>
+        <!-- Input form -->
+        <form id="inputForm">
+            <label for="servers">Number of servers (n):</label>
+            <input type="number" id="servers" name="servers" min="1" value="25" required><br>
+
+            <label for="attackers">Number of attackers (m):</label>
+            <input type="number" id="attackers" name="attackers" min="1" value="50" required><br>
+
+            <label for="probability">Probability of penetration (p):</label>
+            <input type="number" id="probability" name="probability" min="0" max="1" step="0.01" value="0.5" required><br>
+
+            <label for="time">Istant of time T where to check the mid variance:</label>
+            <input type="number" id="time" name="time T" min="0" value="10" required><br>
+
+            <button type="button" onclick="runSimulation()">Run Simulation</button>
+        </form>
+
+        <!-- Charts for visualizing results -->
+        <div class="charts-container" >
+            <div class="chart-wrapper">
+                <canvas id="penetrationLineChart" height="350"></canvas>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="penetrationDistributionChart" height="350"></canvas>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="line2" height="350"></canvas>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="distributionChart2" height="350"></canvas>
+            </div>
+        </div>
+
+        <!-- Panel for statistical results -->
+        <div id="statisticsPanel" class="centered-div">
+            <h3>Statistics</h3>
+            <p><strong>Mean:</strong> <span id="mean">N/A</span></p>
+            <p><strong>Standard Deviation:</strong> <span id="stdDev">N/A</span></p>
+            <p><strong>Mode:</strong> <span id="mode">N/A</span></p>
+        </div>
         </section>
     </main>
 
     <footer>
         <p>&copy; 2024 My Statistics Blog</p>
     </footer>
+
+    <script>
+        let charts= {};
+        function runSimulation() {
+
+            const n = parseInt(document.getElementById('servers').value);
+            const m = parseInt(document.getElementById('attackers').value);
+            const p = parseFloat(document.getElementById('probability').value);
+            const t = parseInt(document.getElementById('time').value);
+ 
+            const results = [];
+            const lineData = [];
+            //helper function to determine successfullnes
+            const attackOutcome = () => Math.random() < p ? 1 : -1;
+           
+            const generateTrajectory = () => {
+                return Array.from({ length: n }, () => 0)  // Creates an array of `n` zeros
+                    .reduce((trajectory) => {
+                        const lastValue = trajectory[trajectory.length - 1] || 0;
+                    return [...trajectory, lastValue + attackOutcome()];
+                    }, []);
+            };
+            // Run simulation for each attacker
+            const allTrajectories = Array.from({ length: m }, () => generateTrajectory());
+
+            // Compute the final distribution of the attackers who reached each penetration level
+            const getDistribution = arr => arr 
+                .map(trajectory => trajectory[trajectory.length - 1]) // Get final position for each attacker
+                .reduce((acc, position) => {
+                    acc[position] = (acc[position] || 0) + 1; // Count occurrences of each final position
+                return acc;
+             }, {});
+            
+            const maxAbsValue = arr => Math.max(...arr.flat().map(Math.abs)); // get max abs value in order to display the correct y axis's values
+            const getSlice = (arr,s,e) => arr.map((x) => x.slice(s,e));
+            let chartRange = maxAbsValue(allTrajectories); 
+            // Update both charts
+            const temp = getSlice(allTrajectories,0,t);
+
+            updateLineChart(temp, t-1,chartRange,'penetrationLineChart');
+            updateDistributionChart(getDistribution(temp), n,chartRange, 'penetrationDistributionChart');
+ 
+            updateLineChart(getSlice(allTrajectories,t,n), n-t,chartRange,'line2');
+            updateDistributionChart(getDistribution(allTrajectories), n,chartRange, 'distributionChart2');
+            console.log(getDistribution(allTrajectories));
+            // Calculate and display statistics using Knuth's algorithm
+            const res = knuthMeanVariance(getDistribution(allTrajectories).Array);
+            const mean = res.mean;
+            const stdDev = res.standardDeviation;
+            const mode = calculateMode(results);
+ 
+            document.getElementById('mean').textContent = mean.toFixed(2)
+            document.getElementById('stdDev').textContent = stdDev.toFixed(2);
+            document.getElementById('mode').textContent = mode;
+        }
+ 
+        function updateLineChart(lineData, n, chartRange, chart) {
+            const ctx = document.getElementById(chart).getContext('2d');
+            const labels = Array.from({ length: n + 1 }, (_, i) => `${i}`);
+            const datasets = lineData.map((data, index) => ({
+                label: `Attacker ${index + 1}`,
+                data: data.map((value, i) => ({ x: i, y: value })), // Properly map x and y
+                fill: false,
+                borderColor: `rgba(${Math.floor(Math.random() * 255)}, 0, 255, 0.7)`,
+                borderWidth: 1,
+                stepped: true, // This makes the line flat until a jump
+                pointRadius:0,
+            }));
+ 
+            if (charts[chart]){
+                charts[chart].destroy();
+            } 
+            charts[chart] = new Chart(ctx, {
+                type: 'line',
+                data: { labels: labels, datasets: datasets },
+                options: {
+                    scales: {
+                       
+                     y: { 
+                     beginAtZero: true, min : -chartRange,max: chartRange,display:false // Always display 0 even if no data reaches it
+                 } 
+                    } ,
+             plugins: {
+                 legend: {
+                     display: false // Disable the legend
+                 }
+             
+                }
+            }});
+        }
+ 
+        function updateDistributionChart(results, n,chartRange,chart) {
+            const ctx = document.getElementById(chart).getContext('2d');
+            const labels = Array.from({ length: chartRange*2+2}, (_, i) => ((-chartRange)+i).toString());
+            console.log(labels);
+            if (charts[chart]){
+                charts[chart].destroy();
+            } 
+            charts[chart] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Number of Attackers',
+                        data: results,
+                        backgroundColor:Array.from({ length: n }, () => 
+                        `rgba(${Math.floor(Math.random() * 255)}, 0, 255, 0.7)`), 
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Align bars with attackers
+                    scales: {
+                        x: { beginAtZero: true },
+                        y: { reverse: true, display:false, beginAtZero:true }
+                    },   
+             plugins: {
+                 legend: {
+                     display: false // Disable the legend
+                 }
+             },
+                }
+            });
+        }
+ 
+        // Knuth's Algorithm for Mean Calculation (more numerically stable)
+        function knuthMeanVariance(arr) {
+         let mean = 0;
+         let M2 = 0; 
+         let N = 0; 
+ 
+         for (let x of arr) {
+             N += 1;
+             const delta = x - mean;
+             mean += delta / N;
+             M2 += delta * (x - mean);
+         }
+ 
+         const variance = N > 1 ? M2 / (N - 1) : 0; // Sample variance; use N for population variance
+         const standardDeviation = Math.sqrt(variance);
+ 
+         return {
+             mean: mean,
+             variance: variance,
+             standardDeviation: standardDeviation,
+         };
+ } 
+ 
+        function calculateMode(arr) {
+            const frequencyMap = {};
+            arr.forEach(value => {
+                if (frequencyMap[value]) {
+                    frequencyMap[value]++;
+                } else {
+                    frequencyMap[value] = 1;
+                }
+            });
+ 
+            let mode = null;
+            let maxCount = 0;
+            for (const [key, value] of Object.entries(frequencyMap)) {
+                if (value > maxCount) {
+                    maxCount = value;
+                    mode = key;
+                }
+            }
+            return mode;
+        }
+    </script>
 </body>
 </html>
