@@ -137,7 +137,6 @@ footer {
 }
 
 .centered-div {
-    background-color: #f5f5f5;
     padding: 20px;
     border-radius: 8px;
     width: 45%; /* Set a percentage width to allow for multiple divs on one line */
