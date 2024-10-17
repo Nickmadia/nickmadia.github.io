@@ -32,7 +32,7 @@ main {
     flex: 1; /* Allow main content to grow and push footer down */
     display: flex;
     justify-content: space-between;
-    max-width: 1200px;
+    max-width: 80%;
     margin: 40px auto;
     padding: 20px;
     background: #111;
