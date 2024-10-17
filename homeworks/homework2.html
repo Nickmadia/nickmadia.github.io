@@ -83,7 +83,7 @@
             function welfordRecursive  ([x, ...xs], n = 0, mean = x, m2 = 0) { 
                 return x === undefined
                     ? { mean, variance: n > 1 ? m2 / (n  ) : 0 }
-                    : welfordRecursive(xs, n + 1, mean + (x - mean) / (n + 1), m2 + (x - mean) * (x - mean ));
+                    : welfordRecursive(xs, n + 1, mean + (x - mean) / (n + 1), m2 + (x - mean) * (x - mean + (x - mean) / (n + 1)));
             } 
         </code>
         </pre>
@@ -371,7 +371,7 @@
         function welfordRecursive  ([x, ...xs], n = 0, mean = x, m2 = 0) { 
             return x === undefined
                 ? { mean, variance: n > 1 ? m2 / (n - 1) : 0 }
-                : welfordRecursive(xs, n + 1, mean + (x - mean) / (n + 1), m2 + (x - mean) * (x - mean ));
+                : welfordRecursive(xs, n + 1, mean + (x - mean) / (n + 1), m2 + (x - mean) * (x - mean + (x - mean) / (n + 1)));
         }   
 
  
