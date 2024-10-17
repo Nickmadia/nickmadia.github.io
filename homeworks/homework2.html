@@ -82,12 +82,37 @@
         <code class="language-javascript">
             function welfordRecursive  ([x, ...xs], n = 0, mean = x, m2 = 0) { 
                 return x === undefined
-                    ? { mean, variance: n > 1 ? m2 / (n - 1) : 0 }
+                    ? { mean, variance: n > 1 ? m2 / (n  ) : 0 }
                     : welfordRecursive(xs, n + 1, mean + (x - mean) / (n + 1), m2 + (x - mean) * (x - mean ));
             } 
         </code>
         </pre>
-        <!-- Input form -->
+        <p>Let's break it down:</p>
+    
+    <ol>
+        <li>The function uses destructuring to separate the first element (<code>x</code>) from the rest of the array (<code>xs</code>).</li>
+        <li>It uses default parameters to initialize the accumulators: <code>n = 0</code>, <code>mean = x</code>, and <code>m2 = 0</code>.</li>
+        <li>The base case and recursive case are handled in a single ternary operation.</li>
+        <li>All calculations are done within the recursive call, eliminating the need for intermediate variables.</li>
+    </ol>
+    
+    <p>The function works as follows:</p>
+    
+    <ul>
+        <li>If <code>x</code> is undefined (i.e., we've processed all elements), we return an object with the final mean and variance.</li>
+        <li>Otherwise, we make a recursive call with updated parameters:
+            <ul>
+                <li>The rest of the array (<code>xs</code>)</li>
+                <li>Increment <code>n</code></li>
+                <li>Update the mean</li>
+                <li>Update m2 (sum of squared differences from the current mean)</li>
+            </ul>
+        </li>
+    </ul>
+    
+    <div class="note">
+        <p><strong>Note:</strong> While this implementation is elegant and concise, it may sacrifice some readability, especially for those not familiar with functional programming patterns.</p>
+    </div>
          <h2>Practice</h2>
         <form id="inputForm">
             <label for="servers">Number of servers (n):</label>
