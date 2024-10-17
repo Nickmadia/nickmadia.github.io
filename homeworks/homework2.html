@@ -6,13 +6,18 @@
     <title>Homework 2: Random Walk, Variance and Standard deviation</title>
     <link rel="stylesheet" href="../style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
     <style>
         .charts-container {
             display: flex;
             margin: 0;
         }
         .chart-wrapper {
-            flex: 1;
+            flex: 0;
         }
         .flipped-chart {
             transform: rotate(90deg); /* Flips the chart by 90 degrees clockwise */
@@ -31,27 +36,62 @@
 
     <main>
         <section>
-            <h2>Title</h2>
-            <h3>Random walk, Variance and Standard Deviation</h3>
+            <h2>Welford's Algorithm</h2>
             <p>
-              bla bla stuff a;sdlkfj as;dlfkj as;ldfkja;slkdjf;asl df;alsdkj f;alskjdf;laskjdf;lkasjdf; alskjfd;alksjdf;lkasjdf;lkajs f
-              The arithmetic average is calculated as the sum of all values divided by the number of values. It’s a simple measure of central tendency, but issues arise in computation:
+                Welford's algorithm provides a numerically stable way to compute both the mean and variance of a data set in a single pass. Unlike traditional methods, which may suffer from floating-point inaccuracies when the data set is large or contains values that significantly differ in magnitude, Welford's method updates the mean and variance iteratively as new data points are processed. The formula for updating the mean, <em>M</em>, and variance, <em>S</em>, after observing the <em>k</em>th data point, <em>xₖ</em>, is as follows:
             </p>
             <ul>
-                <li>ligma</li>
-                <li>ligma</li>
-                <li>ligma</li>
+                <li><strong>Update the mean:</strong> \( M_k = M_{k-1} + \frac{x_k - M_{k-1}}{k} \)</li>
+                <li><strong>Update the variance:</strong> \( S_k = S_{k-1} + (x_k - M_{k-1})(x_k - M_k) \)</li>
             </ul>
-
-            <h2>Research</h2>
-            <p></p>
-
+            <p>
+                After processing all the data points, the variance can be obtained by dividing the final <em>S</em> by <em>n - 1</em>, where <em>n</em> is the total number of data points: \( \text{Variance} = \frac{S_n}{n-1} \). This approach ensures that the calculation is accurate and efficient, even with large data sets, making it ideal for streaming or real-time data analysis.
+            </p>
+            
             <h2>Code</h2>
-            <pre></pre>
+            <p>Here's the formula translated into javascript code</p>
+            <pre>
+                <code class="language-javascript">
+
+        function welford(arr) {
+         let mean = 0;
+         let M2 = 0; 
+         let N = 0; 
+ 
+         for (let x of arr) {
+             N += 1;
+             const delta = x - mean;
+             mean += delta / N;
+             M2 += delta * (x - mean);
+         }
+ 
+         const variance = N > 1 ? M2 / (N ) : 0; // Sample variance; use N for population variance
+         const standardDeviation = Math.sqrt(variance);
+ 
+         return {
+             mean: mean,
+             variance: variance,
+             standardDeviation: standardDeviation,
+         };
+                </code>
+            </pre>
+        <h3>Recursive approach</h3>
+        <p>In order to achieve a more elegant solution I made a recursive version of the welford's algorithm in an haskell-like fashion:</p>
+        <pre>
+
+        <code class="language-javascript">
+            function welfordRecursive  ([x, ...xs], n = 0, mean = x, m2 = 0) { 
+                return x === undefined
+                    ? { mean, variance: n > 1 ? m2 / (n - 1) : 0 }
+                    : welfordRecursive(xs, n + 1, mean + (x - mean) / (n + 1), m2 + (x - mean) * (x - mean ));
+            } 
+        </code>
+        </pre>
         <!-- Input form -->
+         <h2>Practice</h2>
         <form id="inputForm">
             <label for="servers">Number of servers (n):</label>
-            <input type="number" id="servers" name="servers" min="1" value="25" required><br>
+            <input type="number" id="servers" name="servers" min="1" value="250" required><br>
 
             <label for="attackers">Number of attackers (m):</label>
             <input type="number" id="attackers" name="attackers" min="1" value="50" required><br>
@@ -60,7 +100,7 @@
             <input type="number" id="probability" name="probability" min="0" max="1" step="0.01" value="0.5" required><br>
 
             <label for="time">Istant of time T where to check the mid variance:</label>
-            <input type="number" id="time" name="time T" min="0" value="10" required><br>
+            <input type="number" id="time" name="time T" min="0" value="100" required><br>
 
             <button type="button" onclick="runSimulation()">Run Simulation</button>
         </form>
@@ -71,24 +111,83 @@
                 <canvas id="penetrationLineChart" height="350"></canvas>
             </div>
             <div class="chart-wrapper">
-                <canvas id="penetrationDistributionChart" height="350"></canvas>
+                <canvas id="penetrationDistributionChart" width="150" height="350"></canvas>
             </div>
             <div class="chart-wrapper">
-                <canvas id="line2" height="350"></canvas>
+                <canvas id="line2" width="450" height="350"></canvas>
             </div>
             <div class="chart-wrapper">
                 <canvas id="distributionChart2" height="350"></canvas>
             </div>
         </div>
-
+        
         <!-- Panel for statistical results -->
-        <div id="statisticsPanel" class="centered-div">
-            <h3>Statistics</h3>
-            <p><strong>Mean:</strong> <span id="mean">N/A</span></p>
-            <p><strong>Standard Deviation:</strong> <span id="stdDev">N/A</span></p>
-            <p><strong>Mode:</strong> <span id="mode">N/A</span></p>
+        <div class="statistics-container">
+            <div id="statisticsPanelt" class="centered-div">
+                <h3>Statistics at time T</h3>
+                <p><strong>Mean:</strong> <span id="meant">N/A</span></p>
+                <p><strong>Variance:</strong> <span id="stdDevt">N/A</span></p>
+            </div>
+            <div id="statisticsPanel" class="centered-div">
+                <h3>Statistics </h3>
+                <p><strong>Mean:</strong> <span id="mean">N/A</span></p>
+                <p><strong>Variance:</strong> <span id="stdDev">N/A</span></p>
+            </div>
         </div>
+         
+            <h2>Research Notes: Behavior of Mean and Variance with Respect to Time</h2>
+            
+            <article>
+                <h3>1. Relative Frequency in Bernoulli Trials (Penetration Success/Failure Model)</h3>
+                <p><strong>Mean:</strong> In the context of Bernoulli trials (penetrations where the probability of success is fixed), the mean represents the expected proportion of successes over time. As time progresses, the mean should converge toward the true probability <em>p</em> of success as the number of trials increases (by the law of large numbers).</p>
+                <p><strong>Observation:</strong> Initially, fluctuations in the mean are more pronounced because fewer trials introduce more variance. Over time, as more trials occur, the mean stabilizes, converging towards the expected probability of success.</p>
+                <p><strong>Variance:</strong> The variance captures the spread of penetration outcomes. Initially, variance may be higher due to variability in early penetrations. Over time, it also stabilizes.</p>
+                <p><strong>Observation:</strong> Variance tends to decrease as more trials are conducted because the results get averaged out and the distribution becomes more centered around the mean. However, this depends on the probability <em>p</em> of success—closer to <em>p</em> = 0.5, variance is higher; closer to 0 or 1, variance decreases.</p>
+            </article>
+        
+            <article>
+                <h3>2. Absolute Frequency in Bernoulli Trials</h3>
+                <p><strong>Mean:</strong> The mean here refers to the absolute number of penetrations achieved. As time progresses, the mean increases linearly with the number of trials since penetrations accumulate.</p>
+                <p><strong>Observation:</strong> The absolute frequency continues to grow over time. For example, if an attacker has a probability of success <em>p</em> = 0.6, the number of penetrations will increase steadily, reflecting this bias.</p>
+                <p><strong>Variance:</strong> Variance in absolute frequency shows how penetrations deviate from their expected accumulation. Initially, fluctuations are common as there are fewer trials, but over time, variance increases because each additional trial introduces a potential deviation from the expected path.</p>
+                <p><strong>Observation:</strong> Variance grows with time because the total number of penetrations is subject to increasing fluctuations as trials accumulate. This contrasts with relative frequency, where variance tends to stabilize.</p>
+            </article>
+        
+            <article>
+                <h3>3. Relative Frequency in Random Walk Model</h3>
+                <p><strong>Mean:</strong> In the random walk model, the mean represents the expected direction of the walk over time (e.g., how often attackers penetrate or fail). In a fair random walk (50% chance of up/down), the mean remains around zero.</p>
+                <p><strong>Observation:</strong> The relative frequency in a random walk does not stabilize toward a fixed value like Bernoulli trials. Instead, it fluctuates randomly, and the mean tends to stay around the starting point due to the equal likelihood of success/failure. Over time, the fluctuations increase because the longer the walk, the greater the potential deviation from the origin.</p>
+                <p><strong>Variance:</strong> Variance in a random walk grows with time, reflecting increasing uncertainty in the walk's path. Unlike in Bernoulli trials, variance increases indefinitely.</p>
+                <p><strong>Observation:</strong> Variance grows linearly with time, reflecting the growing divergence of attackers' paths from the expected mean. This means the further in time you go, the wider the spread of possible positions.</p>
+            </article>
+        
+            <article>
+                <h3>4. Absolute Frequency in Random Walk Model</h3>
+                <p><strong>Mean:</strong> The absolute frequency here tracks the cumulative changes (successes/failures) over time. In a fair random walk, the mean remains near zero over time.</p>
+                <p><strong>Observation:</strong> For a large number of trials, the absolute position fluctuates more widely. Unlike Bernoulli trials, there’s no fixed direction toward which the system converges—attackers oscillate between successes and failures.</p>
+                <p><strong>Variance:</strong> Like relative frequency, variance grows with time because random walk paths diverge more the longer the process continues.</p>
+                <p><strong>Observation:</strong> The variance increases more rapidly compared to Bernoulli trials, reflecting a growing unpredictability in the attackers' penetration trajectories.</p>
+            </article>
+        
+            <article>
+                <h3>Summary of Observations</h3>
+                <ul>
+                    <li><strong>Bernoulli Model (Success/Failure):</strong>
+                        <ul>
+                            <li><strong>Mean:</strong> Stabilizes toward the true probability <em>p</em> over time in relative frequency and grows in absolute frequency.</li>
+                            <li><strong>Variance:</strong> Decreases over time in relative frequency, but grows in absolute frequency.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Random Walk Model:</strong>
+                        <ul>
+                            <li><strong>Mean:</strong> Remains near zero or fluctuates around a neutral value due to equal chances of success/failure.</li>
+                            <li><strong>Variance:</strong> Grows continuously over time for both relative and absolute frequencies, reflecting increased unpredictability.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </article>
         </section>
+
     </main>
 
     <footer>
@@ -132,22 +231,27 @@
             let chartRange = maxAbsValue(allTrajectories); 
             // Update both charts
             const temp = getSlice(allTrajectories,0,t);
-
+            
             updateLineChart(temp, t-1,chartRange,'penetrationLineChart');
             updateDistributionChart(getDistribution(temp), n,chartRange, 'penetrationDistributionChart');
- 
             updateLineChart(getSlice(allTrajectories,t,n), n-t,chartRange,'line2');
             updateDistributionChart(getDistribution(allTrajectories), n,chartRange, 'distributionChart2');
-            console.log(getDistribution(allTrajectories));
-            // Calculate and display statistics using Knuth's algorithm
-            const res = knuthMeanVariance(getDistribution(allTrajectories).Array);
-            const mean = res.mean;
-            const stdDev = res.standardDeviation;
-            const mode = calculateMode(results);
- 
-            document.getElementById('mean').textContent = mean.toFixed(2)
-            document.getElementById('stdDev').textContent = stdDev.toFixed(2);
-            document.getElementById('mode').textContent = mode;
+            
+            //little helper to get the array representing the distribution
+            const getDistr = x => x.map( y => y[y.length -1 ]);
+            const finalDistribution = getDistr(allTrajectories);
+
+            //distr at time t
+            const rest = welfordRecursive(getDistr(temp));
+            //distr at final 
+            const res = welfordRecursive(finalDistribution);
+            
+
+            document.getElementById('mean').textContent = res.mean.toFixed(3);
+            document.getElementById('meant').textContent = rest.mean.toFixed(3);
+            document.getElementById('stdDev').textContent = res.variance.toFixed(3);
+            document.getElementById('stdDevt').textContent = rest.variance.toFixed(3);
+
         }
  
         function updateLineChart(lineData, n, chartRange, chart) {
@@ -217,9 +321,8 @@
                 }
             });
         }
- 
-        // Knuth's Algorithm for Mean Calculation (more numerically stable)
-        function knuthMeanVariance(arr) {
+
+        function welford(arr) {
          let mean = 0;
          let M2 = 0; 
          let N = 0; 
@@ -231,7 +334,7 @@
              M2 += delta * (x - mean);
          }
  
-         const variance = N > 1 ? M2 / (N - 1) : 0; // Sample variance; use N for population variance
+         const variance = N > 1 ? M2 / (N -1  ) : 0; // Sample variance; use N for population variance
          const standardDeviation = Math.sqrt(variance);
  
          return {
@@ -239,7 +342,13 @@
              variance: variance,
              standardDeviation: standardDeviation,
          };
- } 
+ }      
+        function welfordRecursive  ([x, ...xs], n = 0, mean = x, m2 = 0) { 
+            return x === undefined
+                ? { mean, variance: n > 1 ? m2 / (n - 1) : 0 }
+                : welfordRecursive(xs, n + 1, mean + (x - mean) / (n + 1), m2 + (x - mean) * (x - mean ));
+        }   
+
  
         function calculateMode(arr) {
             const frequencyMap = {};
