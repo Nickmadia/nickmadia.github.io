@@ -25,7 +25,7 @@ h1 {
 }
 h2 {
     margin: 0;
-    color: rgb(240, 32, 255); /* Neon pink */
+    color: #c792ea; /* Neon pink */
 }
 
 main {
@@ -143,4 +143,43 @@ footer {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
-.note { background-color: #232226; border-left: 6px solid #7209b7; padding: 10px; margin-bottom: 15px; }
+.theorem {
+    background-color: #2a2a4a;
+    padding: 20px;
+    border-left: 4px solid #c792ea;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+.proof {
+    background-color: #2a2a4a;
+    padding: 20px;
+    border-left: 4px solid #ff79c6;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+.definition {
+    background-color: #2a2a4a;
+    padding: 20px;
+    border-left: 4px solid #bd93f9;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+.math {
+    font-family: 'Computer Modern', serif;
+    font-style: italic;
+    color: #ff79c6;
+}
+.section {
+    margin-bottom: 40px;
+}
+.note {
+    background-color: #2d1f3d;
+    padding: 20px;
+    border-radius: 4px;
+    margin: 20px 0;
+    border: 1px solid #bd93f9;
+}
+.important {
+    color: #ff79c6;
+    font-weight: bold;
+}
