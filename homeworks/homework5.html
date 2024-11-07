@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homework 5: Understanding Statistical Independence in Probability Theory </title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
+    <style>
+        .charts-container {
+            display: flex;
+            margin: 0;
+        }
+        .chart-wrapper {
+            flex: 0;
+        }
+        .flipped-chart {
+            transform: rotate(90deg); /* Flips the chart by 90 degrees clockwise */
+        }  pre {
+            background-color: #f4f4f409; /* Light gray background */
+            padding: 10px; /* Padding for the code */
+            border-radius: 5px; /* Rounded corners */
+            overflow-x: auto; /* Scrollable if too long */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Homework 5</h1>
+    </header>
+
+    <main>
+        <section>
+          
+
+            <h2 class="">Proving the Cauchy-Schwarz (C-S) Inequality</h2>
+            <p class="">The Cauchy-Schwarz inequality is a fundamental result in linear algebra and statistics that provides a bound on the dot product of two vectors. It states that for any two vectors <code>x</code> and <code>y</code>, the following inequality holds:</p>
+            <div class="definition math">
+              <p>(x · y)^2 ≤ (x · x) * (y · y)</p>
+            </div>
+            <div class="proof">
+            <p>To prove this inequality, we can use the fact that the quadratic expression <code>(x - λy) · (x - λy)</code> is non-negative for any real number λ. Expanding this expression, we get:</p>
+            <div class="math">
+              <p>(x - λy) · (x - λy) = x · x - 2λx · y + λ^2y · y ≥ 0</p>
+            </div>
+            <p>Rearranging the terms, we obtain:</p>
+            <div class="math">
+              <p>λ^2(y · y) - 2λ(x · y) + (x · x) ≥ 0</p>
+            </div>
+            <p>This is a quadratic inequality in λ, and it must hold for all real values of λ. For this to be true, the discriminant of the quadratic expression must be non-positive, i.e.:</p>
+            <div class="math">
+              <p>(2(x · y))^2 - 4(y · y)(x · x) ≤ 0</p>
+            </div>
+            <p>Simplifying, we arrive at the Cauchy-Schwarz inequality:</p>
+            <div class="math">
+              <p>(x · y)^2 ≤ (x · x) * (y · y)></p>
+            </div>
+            </div>
+            <p>The C-S inequality ensures that the absolute value of the correlation coefficient, <code>r</code>, is always less than or equal to 1, making it a useful measure of the strength of the linear relationship between two variables.</p>
+          
+            <h2 class=>Independence vs. Uncorrelation</h2>
+            <p class="">In statistics, the concepts of independence and uncorrelation are related but distinct.</p>
+            <p><strong>Independence:</strong> Two random variables <code>X</code> and <code>Y</code> are said to be independent if the probability of any event involving <code>X</code> is not affected by the value of <code>Y</code>, and vice versa. Mathematically, this means that the joint probability distribution of <code>X</code> and <code>Y</code> can be written as the product of their individual probability distributions: <code>P(X,Y) = P(X) * P(Y)</code>.</p>
+            <p><strong>Uncorrelation:</strong> Two random variables <code>X</code> and <code>Y</code> are said to be uncorrelated if their covariance is zero, i.e., <code>Cov(X,Y) = 0</code>. This means that there is no linear relationship between the two variables.</p>
+            <p>It's important to note that independence implies uncorrelation, but the converse is not always true. Two variables can be uncorrelated without being independent. For example, if <code>X</code> and <code>Y</code> have a nonlinear relationship, they may be uncorrelated (have a covariance of zero) but not independent.</p>
+            <p>To measure the strength of the linear relationship between two variables, the correlation coefficient <code>r</code> is commonly used. As mentioned earlier, the C-S inequality ensures that <code>|r| ≤ 1</code>, with <code>r = 0</code> indicating uncorrelation and <code>|r| = 1</code> indicating a perfect linear relationship.</p>
+            <h2>Improvements to the simulator</h2>
+            <p>In order to abstract the model I had to create a new class from scratch in order to handle different the different types of SDE.</p>
+            <pre>
+                <code class="language-javascript">
+
+                    class SDESimulator{
+                        constructor(typeFunction,options) {
+                            this.typeFunction = typeFunction.step;
+                            this.options = options;
+                            this.lineData;
+                            this.lineDataSlice;
+                            this.distributionData;
+                        }
+            
+                        // Compute the final distribution of the attackers who reached each penetration level
+                        getDistribution(arr) {
+                            return arr.map(trajectory => trajectory[trajectory.length - 1]) // Get final position for each attacker
+                            .reduce((acc, position) => {
+                                acc[position] = (acc[position] || 0) + 1; // Count occurrences of each final position
+                            return acc;
+                         }, {});
+                        }
+                        genTrajectory(n) {
+                            return Array.from({ length: n }, () => 0)  // Creates an array of `n` zeros
+                                .reduce((trajectory) => {
+                                    const lastValue = trajectory[trajectory.length - 1] || 0;
+                                return [...trajectory, lastValue + this.typeFunction()];
+                                }, []);
+                        }
+                        genLineData(n,m) {
+                            return Array.from({length: m}, ()=> this.genTrajectory(n));
+                        }
+                        plot(tp){
+                            //helper to get max abs value in order to adjust y axis
+                            const maxAbsValue = arr => Math.max(...arr.flat().map(Math.abs)); 
+            
+                            // helper to get a slice of the line array
+                            const getSlice = (arr,s,e) => arr.map((x) => x.slice(s,e));
+            
+                            let chartRange = maxAbsValue(this.lineData).toFixed(2); 
+                            const n = this.options.servers;
+                            const t = this.options.t;
+                            
+                            tp.calcScales(chartRange,n) 
+                            this.lineDataSlice = getSlice(this.lineData,0,t);
+            
+                            updateLineChart(this.lineDataSlice, t-1,chartRange,'penetrationLineChart',tp.lineGraphScales);
+                            updateDistributionChart(this.getDistribution(this.lineDataSlice), n,chartRange
+                                        , 'penetrationDistributionChart',tp.distrGraphScales,tp.labels);
+                            updateLineChart(getSlice(this.lineData,t,n), n-t,chartRange,'line2',tp.lineGraphScales);
+                            updateDistributionChart(this.distributionData, n,chartRange
+                                        , 'distributionChart2',tp.distrGraphScales,tp.labels);
+                        }
+                        printStats(){
+                            const getDistr = x => x.map( y => y[y.length -1 ]);
+                            const finalDistribution = getDistr(this.lineData);
+            
+                            //distr at time t
+                            const rest = welfordRecursive(getDistr(this.lineDataSlice));
+                            //distr at final 
+                            const res = welfordRecursive(finalDistribution);
+                        
+            
+                        document.getElementById('mean').textContent = res.mean.toFixed(3);
+                        document.getElementById('meant').textContent = rest.mean.toFixed(3);
+                        document.getElementById('stdDev').textContent = res.variance.toFixed(3);
+                        document.getElementById('stdDevt').textContent = rest.variance.toFixed(3);
+                        }
+                        simulate() {
+                            this.lineData = this.genLineData(this.options.servers,this.options.attackers);
+                            this.distributionData = this.getDistribution(this.lineData);
+                        }
+            
+                    }
+                </code>
+            </pre>
+            <p>I also had to create a class capable to handle the different types of SDE and the different plotting handlers. This made possible to create a super clean Run function.</p>
+            <pre>
+
+                <code class="language-javascript">
+                    function runSimulation() {
+                        const options = acquireOptions(); 
+                         const tp = new SDEType(options);
+                         
+                         const sim = new SDESimulator(tp,options);
+                         sim.simulate();
+                         sim.plot(tp);
+                         sim.printStats();
+                     }
+                </code>
+                </pre>
+            <h2>E-M Simulator</h2>
+        <form id="inputForm">
+            <label for="servers"># Times (n):</label>
+            <input type="number" id="servers" name="servers" min="1" value="250" required><br>
+
+            <label for="attackers"># Sample Paths(n):</label>
+            <input type="number" id="attackers" name="attackers" min="1" value="50" required><br>
+
+            <label for="probability">Probability (p):</label>
+            <input type="number" id="probability" name="probability" min="0" max="1" step="0.01" value="0.5" required><br>
+
+            <label for="time">Istant of time T where to check the mid variance:</label>
+            <input type="number" id="time" name="time T" min="0" value="100" required><br>
+
+            <label for="typeSelector">Select Type:</label>
+        <select id="typeSelector">
+            <option value="0">Discrete Random Jump</option>
+            <option value="1">Discrete Random Walk</option>
+            <option value="2">Continuous Random Jump</option>
+            <option value="3">Continuous Random Walk</option>
+        </select>
+
+            <button type="button" onclick="runSimulation()">Run Simulation</button>
+        </form>
+
+        <!-- Charts for visualizing results -->
+        <div class="charts-container" >
+            <div class="chart-wrapper">
+                <canvas id="penetrationLineChart" height="350"></canvas>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="penetrationDistributionChart" width="150" height="350"></canvas>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="line2" width="450" height="350"></canvas>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="distributionChart2" height="350"></canvas>
+            </div>
+        </div>
+        
+        <!-- Panel for statistical results -->
+        <div class="statistics-container">
+            <div id="statisticsPanelt" class="centered-div">
+                <h3>Statistics at time T</h3>
+                <p><strong>Mean:</strong> <span id="meant">N/A</span></p>
+                <p><strong>Variance:</strong> <span id="stdDevt">N/A</span></p>
+            </div>
+            <div id="statisticsPanel" class="centered-div">
+                <h3>Statistics </h3>
+                <p><strong>Mean:</strong> <span id="mean">N/A</span></p>
+                <p><strong>Variance:</strong> <span id="stdDev">N/A</span></p>
+            </div>
+        </div>
+         
+            
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2024 My Statistics Blog</p>
+    </footer>
+       <script>        let charts= {};
+       function runSimulation() {
+           const options = acquireOptions(); 
+            const tp = new SDEType(options);
+            
+            const sim = new SDESimulator(tp,options);
+            sim.simulate();
+            sim.plot(tp);
+            sim.printStats();
+        }
+       function sortObjectByNumericKeys(obj) {
+        return Object.keys(obj)
+          .map(Number) // Convert keys to numbers
+          .sort((a, b) => a - b) // Sort numerically in ascending order
+          .reduce((sortedObj, key) => {
+            sortedObj[key] = obj[key.toString()]; // Use string version of key for accessing the original object
+            return sortedObj;
+          }, {});
+      }
+        class SDESimulator{
+            constructor(typeFunction,options) {
+                this.typeFunction = typeFunction.step;
+                this.options = options;
+                this.lineData;
+                this.lineDataSlice;
+                this.distributionData;
+            }
+
+            // Compute the final distribution of the attackers who reached each penetration level
+            getDistribution(arr) {
+                return arr.map(trajectory => trajectory[trajectory.length - 1]) // Get final position for each attacker
+                .reduce((acc, position) => {
+                    acc[position] = (acc[position] || 0) + 1; // Count occurrences of each final position
+                return acc;
+             }, {});
+            }
+            genTrajectory(n) {
+                return Array.from({ length: n }, () => 0)  // Creates an array of `n` zeros
+                    .reduce((trajectory) => {
+                        const lastValue = trajectory[trajectory.length - 1] || 0;
+                    return [...trajectory, lastValue + this.typeFunction()];
+                    }, []);
+            }
+            genLineData(n,m) {
+                return Array.from({length: m}, ()=> this.genTrajectory(n));
+            }
+            plot(tp){
+                //helper to get max abs value in order to adjust y axis
+                const maxAbsValue = arr => Math.max(...arr.flat().map(Math.abs)); // get max abs value in order to display the correct y axis's values
+
+                // helper to get a slice of the line array
+                const getSlice = (arr,s,e) => arr.map((x) => x.slice(s,e));
+
+                let chartRange = maxAbsValue(this.lineData).toFixed(2); 
+                const n = this.options.servers;
+                const t = this.options.t;
+                
+                tp.calcScales(chartRange,n) 
+                this.lineDataSlice = getSlice(this.lineData,0,t);
+
+                updateLineChart(this.lineDataSlice, t-1,chartRange,'penetrationLineChart',tp.lineGraphScales);
+                updateDistributionChart(this.getDistribution(this.lineDataSlice), n,chartRange, 'penetrationDistributionChart',tp.distrGraphScales,tp.labels);
+                updateLineChart(getSlice(this.lineData,t,n), n-t,chartRange,'line2',tp.lineGraphScales);
+                updateDistributionChart(this.distributionData, n,chartRange, 'distributionChart2',tp.distrGraphScales,tp.labels);
+            }
+            printStats(){
+                const getDistr = x => x.map( y => y[y.length -1 ]);
+                const finalDistribution = getDistr(this.lineData);
+
+                //distr at time t
+                const rest = welfordRecursive(getDistr(this.lineDataSlice));
+                //distr at final 
+                const res = welfordRecursive(finalDistribution);
+            
+
+            document.getElementById('mean').textContent = res.mean.toFixed(3);
+            document.getElementById('meant').textContent = rest.mean.toFixed(3);
+            document.getElementById('stdDev').textContent = res.variance.toFixed(3);
+            document.getElementById('stdDevt').textContent = rest.variance.toFixed(3);
+            }
+            simulate() {
+                this.lineData = this.genLineData(this.options.servers,this.options.attackers);
+                this.distributionData = this.getDistribution(this.lineData);
+            }
+
+        }
+
+        class SDEType{
+            constructor(options ) {
+                this.options = options;
+                this.lineGraphScales;
+                this.distrGraphScales;
+                this.labels ;
+                switch(this.options.type) {
+                    case 0:
+                        this.step = this.discreteRandomJump;
+                        break;  
+                    case 1:
+                    this.step = this.discreteRandomWalk;
+                        break;
+                    case 2:
+                        this.step = this.continuousrandomJump;
+                        break;  
+                    case 3:
+                    this.step = this.continuousRandomWalk;
+                        break;
+                }
+                
+            }
+            calcScales(chartRange,servers){
+                switch (this.options.type) {
+                case 0:
+                    this.lineGraphScales ={
+                      
+                      y: { 
+                      min: 0, // Always start the y-axis from 0
+                      max: chartRange, // Set the y-axis maximum to the number of servers
+                      beginAtZero: true, // Always display 0 even if no data reaches it
+                      display : false
+                  }}; 
+                    this.distrGraphScales = {
+
+                       x: { beginAtZero: true },
+                       y: { reverse: true, display:false}
+                   };
+                    this.labels = Array.from({ length: chartRange + 1 }, (_, i) => i.toString());
+                    break;
+                case 1: 
+                    this.lineGraphScales = {
+                        y: { 
+                     beginAtZero: true, min : -chartRange,max: chartRange,display:false // Always display 0 even if no data reaches it
+                 } 
+                      }; 
+                    this.distrGraphScales =  {
+                        x: { beginAtZero: true },
+                        y: { reverse: true, display:false, beginAtZero:true }
+                    };
+                    
+                    this.labels = Array.from({ length: chartRange*2+2}, (_, i) => ((-chartRange)+i).toString());
+                    break;
+                case 2:
+                    this.lineGraphScales = {
+                        y: { 
+                     beginAtZero: true, max: chartRange,display:false // Always display 0 even if no data reaches it
+                 } 
+                      }; 
+                    this.distrGraphScales =  {
+                        x: { beginAtZero: true },
+                        y: { reverse: true, display:false, beginAtZero:true }
+                    };
+
+                    this.labels = Array.from({ length: chartRange}, (_, i) => (i).toString());
+                    break;
+                case 3:
+                    this.lineGraphScales = {
+                        y: { 
+                     beginAtZero: true, min : -chartRange,max: chartRange,display:false // Always display 0 even if no data reaches it
+                 } 
+                      }; 
+                    this.distrGraphScales =  {
+                        x: { beginAtZero: true },
+                        y: { reverse: true, display:false, beginAtZero:true }
+                    };
+                    break;
+                default:
+            }
+            }
+            discreteRandomJump() {
+                
+                return (Math.random() < this.options.p ? 1 : 0);
+
+            }
+            discreteRandomWalk() {
+
+                return (Math.random() < this.options.p ? 1 : -1);
+            }
+            continuousrandomJump() {
+                return Math.random() < this.options.p? 1 : 0;
+            }
+            continuousRandomWalk() {
+                return (Math.random() < this.options.p ? 1 : -1)* Math.sqrt(1/this.options.servers);
+            }
+        }
+        
+        function updateLineChart(lineData, n, chartRange, chart, lscales) {
+            const ctx = document.getElementById(chart).getContext('2d');
+            const labels = Array.from({ length: n + 1 }, (_, i) => `${i}`);
+            const datasets = lineData.map((data, index) => ({
+                label: `Attacker ${index + 1}`,
+                data: data.map((value, i) => ({ x: i, y: value })), // Properly map x and y
+                fill: false,
+                borderColor: `rgba(${Math.floor(Math.random() * 255)}, 0, 255, 0.7)`,
+                borderWidth: 1,
+                stepped: true, // This makes the line flat until a jump
+                pointRadius:0,
+            }));
+ 
+            if (charts[chart]){
+                charts[chart].destroy();
+            } 
+            charts[chart] = new Chart(ctx, {
+                type: 'line',
+                data: { labels: labels, datasets: datasets },
+                options: {
+                    scales: lscales ,
+             plugins: {
+                 legend: {
+                     display: false // Disable the legend
+                 }
+             
+                }
+            }});
+        }
+ 
+        function updateDistributionChart(results, n,chartRange,chart,dscales,labels) {
+            const ctx = document.getElementById(chart).getContext('2d');
+            if (charts[chart]){
+                charts[chart].destroy();
+            } 
+            charts[chart] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels : labels,
+                    datasets: [{
+                        label: 'Number of Attackers',
+                        data: results,
+                        backgroundColor:Array.from({ length: n }, () => 
+                        `rgba(${Math.floor(Math.random() * 255)}, 0, 255, 0.7)`), 
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Align bars with attackers
+                    scales: dscales,   
+             plugins: {
+                 legend: {
+                     display: false // Disable the legend
+                 }
+             },
+                }
+            });
+        }
+        function acquireOptions(){
+            return  {
+            servers : parseInt(document.getElementById('servers').value),
+            attackers: parseInt(document.getElementById('attackers').value),
+            p : parseFloat(document.getElementById('probability').value),
+            t : parseInt(document.getElementById('time').value),
+            type : parseInt(document.getElementById('typeSelector').value)
+            }
+        }
+        function welford(arr) {
+         let mean = 0;
+         let M2 = 0; 
+         let N = 0; 
+ 
+         for (let x of arr) {
+             N += 1;
+             const delta = x - mean;
+             mean += delta / N;
+             M2 += delta * (x - mean);
+         }
+ 
+         const variance = N > 1 ? M2 / (N -1  ) : 0; // Sample variance; use N for population variance
+         const standardDeviation = Math.sqrt(variance);
+ 
+         return {
+             mean: mean,
+             variance: variance,
+             standardDeviation: standardDeviation,
+         };
+ }      
+        function welfordRecursive  ([x, ...xs], n = 0, mean = x, m2 = 0) { 
+            return x === undefined
+                ? { mean, variance: n > 1 ? m2 / (n - 1) : 0 }
+                : welfordRecursive(xs, n + 1, mean + (x - mean) / (n + 1), m2 + (x - mean) * (x - mean + (x - mean) / (n + 1)));
+        }   
+
+ 
+        function calculateMode(arr) {
+            const frequencyMap = {};
+            arr.forEach(value => {
+                if (frequencyMap[value]) {
+                    frequencyMap[value]++;
+                } else {
+                    frequencyMap[value] = 1;
+                }
+            });
+ 
+            let mode = null;
+            let maxCount = 0;
+            for (const [key, value] of Object.entries(frequencyMap)) {
+                if (value > maxCount) {
+                    maxCount = value;
+                    mode = key;
+                }
+            }
+            return mode;
+        }
+       </script>
+</body>
+</html>
