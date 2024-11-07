@@ -69,6 +69,21 @@
             <p><strong>Uncorrelation:</strong> Two random variables <code>X</code> and <code>Y</code> are said to be uncorrelated if their covariance is zero, i.e., <code>Cov(X,Y) = 0</code>. This means that there is no linear relationship between the two variables.</p>
             <p>It's important to note that independence implies uncorrelation, but the converse is not always true. Two variables can be uncorrelated without being independent. For example, if <code>X</code> and <code>Y</code> have a nonlinear relationship, they may be uncorrelated (have a covariance of zero) but not independent.</p>
             <p>To measure the strength of the linear relationship between two variables, the correlation coefficient <code>r</code> is commonly used. As mentioned earlier, the C-S inequality ensures that <code>|r| ≤ 1</code>, with <code>r = 0</code> indicating uncorrelation and <code>|r| = 1</code> indicating a perfect linear relationship.</p>
+
+            
+            <div class="note">
+    <h3>Examples</h3> 
+    <ul >
+        <li><strong>Independent and Uncorrelated</strong>: Suppose X and Y are independent random variables. Any function of X remains independent of any function of Y, and they are thus also uncorrelated.</li>
+        
+        
+        
+        <li><strong>Uncorrelated but Not Independent</strong>: Let X be a continuous random variable uniformly distributed over [−1,1], and let Y=X<sup>2</sup>. X and Y are uncorrelated (since the expected value E[X⋅Y]=E[X3]=0, which implies Cov(X, Y)=0), but they are clearly not independent, as Y is completely determined by X.</li>
+        </ul>
+</div>
+
+            
+            
             <h2>Improvements to the simulator</h2>
             <p>In order to abstract the model I had to create a new class from scratch in order to handle different the different types of SDE.</p>
             <pre>
