@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Fundamental Theorem of Calculus: A Bridge to Probability Theory </title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
+    <style>
+        .charts-container {
+            display: flex;
+            margin: 0;
+        }
+        .chart-wrapper {
+            flex: 0;
+        }
+        .flipped-chart {
+            transform: rotate(90deg); /* Flips the chart by 90 degrees clockwise */
+        }  pre {
+            background-color: #f4f4f409; /* Light gray background */
+            padding: 10px; /* Padding for the code */
+            border-radius: 5px; /* Rounded corners */
+            overflow-x: auto; /* Scrollable if too long */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Homework 6</h1>
+    </header>
+
+    <main>
+        <section>
+          <h1>The Fundamental Theorem of Calculus: A Bridge to Probability Theory</h1>
+    
+          <p>The Fundamental Theorem of Calculus (FTC) is one of the most important results in mathematics, establishing the relationship between differentiation and integration. What's particularly fascinating is how this theorem extends into probability theory, specifically in understanding the relationship between probability density functions (PDFs) and cumulative distribution functions (CDFs).</p>
+      
+          <h2>The Fundamental Theorem of Calculus</h2>
+      
+          <div class="theorem">
+              <h3>Statement of the Theorem</h3>
+              <p>The FTC consists of two main parts:</p>
+              <p><strong>Part 1:</strong> If \(f(x)\) is continuous on \([a,b]\) and \(F(x)\) is defined by:</p>
+              <p>\[F(x) = \int_a^x f(t)dt\]</p>
+              <p>Then \(F'(x) = f(x)\)</p>
+              
+              <p><strong>Part 2:</strong> If \(f\) is continuous on \([a,b]\) and \(F\) is any antiderivative of \(f\), then:</p>
+              <p>\[\int_a^b f(x)dx = F(b) - F(a)\]</p>
+          </div>
+      
+          <h2>Connection to Probability Theory</h2>
+      
+          <p>This relationship beautifully mirrors the connection between probability density functions and cumulative distribution functions:</p>
+      
+          <div class="proof">
+              <h3>PDF and CDF Relationship</h3>
+              <p>For a continuous random variable X:</p>
+              <ul>
+                  <li>The CDF \(F_X(x)\) is defined as: \[F_X(x) = P(X \leq x) = \int_{-\infty}^x f_X(t)dt\]</li>
+                  <li>The PDF \(f_X(x)\) is the derivative of the CDF: \[f_X(x) = \frac{d}{dx}F_X(x)\]</li>
+              </ul>
+          </div>
+      
+          <h2>Key Properties and Implications</h2>
+      
+          <div class="note">
+              <h3>Important Observations</h3>
+              <ol>
+                  <li>Just as \(F(x)\) in the FTC represents the accumulated area under \(f(x)\), the CDF \(F_X(x)\) represents the accumulated probability up to x.</li>
+                  <li>The PDF must be non-negative and integrate to 1 over its entire domain:
+                      \[\int_{-\infty}^{\infty} f_X(x)dx = 1\]</li>
+                  <li>The CDF is always non-decreasing and has limits:
+                      \[\lim_{x \to -\infty} F_X(x) = 0 \text{ and } \lim_{x \to \infty} F_X(x) = 1\]</li>
+              </ol>
+          </div>
+      
+          <h2>Practical Example</h2>
+      
+          <div class="proof">
+              <h3>Standard Normal Distribution</h3>
+              <p>Consider the standard normal distribution:</p>
+              <p>PDF: \[f(x) = \frac{1}{\sqrt{2\pi}}e^{-x^2/2}\]</p>
+              <p>CDF: \[\Phi(x) = \int_{-\infty}^x \frac{1}{\sqrt{2\pi}}e^{-t^2/2}dt\]</p>
+              <p>By the FTC: \[\frac{d}{dx}\Phi(x) = f(x)\]</p>
+          </div>
+      
+          <h2>Conclusion</h2>
+          
+          <p>The Fundamental Theorem of Calculus provides the mathematical foundation for understanding how probability distributions work. This connection highlights the deep relationship between calculus and probability theory, showing how mathematical concepts are interconnected in profound ways.</p>
+      
+
+            <h1>Practice</h1>
+        <form id="inputForm">
+            <label for="samples"># samples (n):</label>
+            <input type="number" id="samples" name="samples" min="1" value="1000" required><br>
+
+
+            <button type="button" onclick="runSimulation()">Run Simulation</button>
+        </form>
+
+        <!-- Charts for visualizing results -->
+            <canvas id="distributionChart" height="300" width="800"> </canvas>
+            <canvas id="meanVarianceChart" height="300" width="800"></canvas>
+       
+        
+        <!-- Panel for statistical results -->
+        <div class="statistics-container">
+            <div id="statisticsPanelt" class="centered-div">
+                <h3>Theoretical Stats</h3>
+                <p><strong>Mean:</strong> <span id="meant">N/A</span></p>
+                <p><strong>Variance:</strong> <span id="stdDevt">N/A</span></p>
+            </div>
+            <div id="statisticsPanel" class="centered-div">
+                <h3>Empirical Stats</h3>
+                <p><strong>Mean:</strong> <span id="mean">N/A</span></p>
+                <p><strong>Variance:</strong> <span id="stdDev">N/A</span></p>
+            </div>
+        </div>
+         
+            
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2024 My Statistics Blog</p>
+    </footer>
+       <script>        
+        let charts= {};
+        const values = [1, 2, 3, 4]; // Numerical values for mean/variance calculation
+        const probabilities = [0.1, 0.3, 0.4, 0.2];
+        const theoreticalMean = values.reduce((sum, val, i) => sum + val * probabilities[i], 0);
+        const theoreticalVariance = values.reduce((sum, val, i) => sum + probabilities[i] * Math.pow(val - theoreticalMean, 2), 0);
+       function runSimulation() {
+            //const options = acquireOptions(); 
+
+                        // Values and probabilities for the discrete distribution
+
+            // Theoretical mean and variance
+
+            // Generate realizations and track frequencies, mean, variance
+            const realizations = [];
+            const empiricalFrequencies = Array(values.length).fill(0);
+            const empiricalMeans = [];
+            const empiricalVariances = [];
+            const stats = new Welford();
+
+            const maxSamples = parseInt(document.getElementById('samples').value);
+            for (let i = 1; i <= maxSamples; i++) {
+                const realization = generateRealization(values, probabilities);
+                realizations.push(realization);
+
+                // Update frequencies
+                const index = values.indexOf(realization);
+                empiricalFrequencies[index]++;
+
+                // Update mean and variance using Welford's algorithm
+                stats.add(realization);
+                empiricalMeans.push(stats.mean);
+                empiricalVariances.push(stats.variance());
+
+                if (i % 500 === 0 || i === maxSamples) {
+                }
+            }
+            updateCharts(maxSamples, empiricalFrequencies.map(f => f/maxSamples), empiricalMeans, empiricalVariances);
+            udpateStats(theoreticalMean,theoreticalVariance,empiricalMeans[maxSamples-1],empiricalVariances[maxSamples-1]);
+    }
+  function udpateStats(tMean,tVariance,eMean,eVariance) {
+    document.getElementById('mean').textContent = eMean.toFixed(3);
+    document.getElementById('meant').textContent = tMean.toFixed(3);
+    document.getElementById('stdDev').textContent = eVariance.toFixed(3);
+    document.getElementById('stdDevt').textContent = tVariance.toFixed(3);
+  }
+  // Function to generate random realization based on a given probability distribution
+  function generateRealization(values, probabilities) {
+    const cumulativeProbabilities = [];
+    probabilities.reduce((acc, prob, i) => {
+      cumulativeProbabilities[i] = acc + prob;
+      return cumulativeProbabilities[i];
+    }, 0);
+
+    const rand = Math.random();
+    return values[cumulativeProbabilities.findIndex(cumProb => rand < cumProb)];
+  }
+
+  // Welford's algorithm for mean and variance computation
+  class Welford {
+    constructor() {
+      this.n = 0;
+      this.mean = 0;
+      this.m2 = 0; // Sum of squares of differences from the current mean
+    }
+
+    add(value) {
+      this.n++;
+      const delta = value - this.mean;
+      this.mean += delta / this.n;
+      this.m2 += delta * (value - this.mean);
+    }
+
+    variance() {
+      return this.n > 1 ? this.m2 / (this.n - 1) : 0;
+    }
+  }
+
+  
+
+  function updateCharts(samples, empiricalDistribution, empiricalMeans, empiricalVariances) {
+    const ctx1 = document.getElementById('distributionChart').getContext('2d');
+    if (charts['distributionChart']){
+                charts['distributionChart'].destroy();
+            } 
+        charts['distributionChart'] =new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: values.map(v => `Value ${v}`),
+        datasets: [
+          {
+            label: 'Theoretical Distribution',
+            data: probabilities,
+            borderColor: 'rgba(75, 0, 255, 0.7)',
+            fill: false,
+            pointStyle: 'circle',
+          },
+          {
+            label: `Empirical Distribution (${samples} samples)`,
+            data: empiricalDistribution,
+            borderColor: 'rgba(200, 0, 255, 0.7)',
+            fill: false,
+            pointStyle: 'rect',
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: `Distribution Convergence (${samples} samples)`
+          }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    if (charts['meanVarianceChart']){
+                charts['meanVarianceChart'].destroy();
+            } 
+    const ctx2 = document.getElementById('meanVarianceChart').getContext('2d');
+    charts['meanVarianceChart'] = new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: Array.from({ length: samples }, (_, i) => i + 1),
+        datasets: [
+          {
+            label: 'Empirical Mean',
+            data: empiricalMeans,
+            borderColor: `rgba(200, 0, 255, 0.7)`,
+            fill: false,
+            pointRadius: 0,
+          },
+          {
+            label: 'Theoretical Mean',
+            data: Array(samples).fill(theoreticalMean),
+            borderColor: `rgba(100, 0, 255, 0.7)`,
+            borderDash: [5, 5],
+            fill: false,
+            pointRadius: 0,
+          },
+          {
+            label: 'Empirical Variance',
+            data: empiricalVariances,
+            borderColor: `rgba(0, 0, 255, 0.7)`,
+            fill: false, pointRadius: 0,
+          },
+          {
+            label: 'Theoretical Variance',
+            data: Array(samples).fill(theoreticalVariance),
+            borderColor: `rgba(255, 0, 255, 0.7)`,
+            borderDash: [5, 5],
+            fill: false, pointRadius: 0,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Empirical Mean and Variance Convergence'
+          }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  }
+        function acquireOptions(){
+            return  {
+            servers : parseInt(document.getElementById('servers').value),
+            attackers: parseInt(document.getElementById('attackers').value),
+            p : parseFloat(document.getElementById('probability').value),
+            t : parseInt(document.getElementById('time').value),
+            type : parseInt(document.getElementById('typeSelector').value)
+            }
+        }
+        function welford(arr) {
+         let mean = 0;
+         let M2 = 0; 
+         let N = 0; 
+ 
+         for (let x of arr) {
+             N += 1;
+             const delta = x - mean;
+             mean += delta / N;
+             M2 += delta * (x - mean);
+         }
+ 
+         const variance = N > 1 ? M2 / (N -1  ) : 0; // Sample variance; use N for population variance
+         const standardDeviation = Math.sqrt(variance);
+ 
+         return {
+             mean: mean,
+             variance: variance,
+             standardDeviation: standardDeviation,
+         };
+ }      
+        function welfordRecursive  ([x, ...xs], n = 0, mean = x, m2 = 0) { 
+            return x === undefined
+                ? { mean, variance: n > 1 ? m2 / (n - 1) : 0 }
+                : welfordRecursive(xs, n + 1, mean + (x - mean) / (n + 1), m2 + (x - mean) * (x - mean + (x - mean) / (n + 1)));
+        }   
+
+ 
+        function calculateMode(arr) {
+            const frequencyMap = {};
+            arr.forEach(value => {
+                if (frequencyMap[value]) {
+                    frequencyMap[value]++;
+                } else {
+                    frequencyMap[value] = 1;
+                }
+            });
+ 
+            let mode = null;
+            let maxCount = 0;
+            for (const [key, value] of Object.entries(frequencyMap)) {
+                if (value > maxCount) {
+                    maxCount = value;
+                    mode = key;
+                }
+            }
+            return mode;
+        }
+       </script>
+</body>
+</html>
