@@ -198,4 +198,14 @@ footer {
     padding: 10px; /* Padding for the code */
     border-radius: 5px; /* Rounded corners */
     overflow-x: auto; /* Scrollable if too long */
+}.input-group {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+} .inputs-container {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
 }
