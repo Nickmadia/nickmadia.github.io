@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Fundamental Theorem of Calculus: A Bridge to Probability Theory </title>
+    <title>The Magic of the Central Limit Theorem </title>
     <link rel="stylesheet" href="../style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -64,14 +64,82 @@
 
     <main>
         <section>
+          <h1>The Central Limit Theorem: A Statistical Miracle</h1>
+
+          <div class="theorem">
+              <h3>Central Limit Theorem Statement</h3>
+              <p>Let \(X_1, X_2, \ldots, X_n\) be independent and identically distributed random variables with:</p>
+              <ul>
+                  <li>\(\mathbb{E}[X_i] = \mu\)</li>
+                  <li>\(Var(X_i) = \sigma^2\)</li>
+              </ul>
+      
+              <p>Then as \(n \to \infty\), the distribution of the sample mean \(\bar{X}\) converges to a normal distribution:</p>
+      
+              <p>\[\bar{X} \sim \mathcal{N}\left(\mu, \frac{\sigma^2}{n}\right)\]</p>
+          </div>
+      
+          <div class="key-insight">
+              <p>The Central Limit Theorem reveals a profound statistical truth: regardless of the original distribution's shape, sample means will converge to a normal distribution as sample size increases.</p>
+          </div>
+      
+          <h2>Mathematical Foundations</h2>
+      
+          <div class="theorem">
+              <h3>Mean Calculation</h3>
+              <p>Population mean calculated as:</p>
+              <p>\[\mu = \mathbb{E}[X] = \sum_{i} x_i \cdot P(X = x_i)\]</p>
+          </div>
+      
+          <div class="theorem">
+              <h3>Variance Calculation</h3>
+              <p>Population variance defined as:</p>
+              <p>\[\sigma^2 = \mathbb{E}[(X - \mu)^2] = \sum_{i} (x_i - \mu)^2 \cdot P(X = x_i)\]</p>
+          </div>
+      
+          <h2>Practical Implications</h2>
+      
+          <div class="key-insight">
+              <p>The theorem's significance lies in its universality: it applies across diverse fields including:</p>
+              <ul>
+                  <li>Statistical inference</li>
+                  <li>Hypothesis testing</li>
+                  <li>Confidence interval estimation</li>
+                  <li>Financial risk analysis</li>
+              </ul>
+          </div>
+      
+          <h2>Convergence Principle</h2>
+      
+          <div class="theorem">
+              <h3>Probabilistic Convergence</h3>
+              <p>As sample size increases, the standardized sample mean converges to the standard normal distribution:</p>
+              <p>\[\lim_{n \to \infty} P\left(\frac{\bar{X} - \mu}{\sigma/\sqrt{n}} \leq z\right) = \Phi(z)\]</p>
+              <p>Where \(\Phi(z)\) is the cumulative distribution function of the standard normal distribution.</p>
+          </div>
+      
+          <h2>Practical Considerations</h2>
+      
+          <p>The rate of convergence depends on the original distribution's characteristics:</p>
+          <ul>
+              <li>Symmetric distributions: Faster convergence</li>
+              <li>Highly skewed distributions: Slower convergence</li>
+              <li>Generally, larger sample sizes improve approximation</li>
+          </ul>
+      
+          <h2>Conclusion</h2>
+      
+          <p>The Central Limit Theorem bridges randomness and predictability, demonstrating how complex statistical phenomena can be understood through elegant mathematical principles.</p>
+      
+
           <h1>Practice</h1>
           <form id="inputForm">
             <div class="input-group">
   
               <label for="samples"># samples (n): </label>
-              <input type="number" id="maxSamples" name="samples" min="1" value="30" required><br>
+              <input type="number" id="maxSamples" name="samples" min="1" value="3000" required><br>
               <label for="samplesSize">sample size (m): </label>
-              <input type="number" id="sampleSize" name="samples" min="1" value="1000" required><br>
+              <input type="number" id="sampleSize" name="samples" min="1" value="500" required><br>
             </div>
             <div class="inputs-container">
               <div class="input-group">
@@ -123,14 +191,12 @@
               <div id="statisticsPanel" class="centered-div">
                   <h3>Empirical Stats</h3>
                   <p><strong>Mean of Means:</strong> <span id="mean">N/A</span></p>
-                  <p><strong>Variance of Variances:</strong> <span id="stdDev">N/A</span></p>
+                  <p><strong>Variance of Means:</strong> <span id="stdDev">N/A</span></p>
               </div>
           </div>
         </section>
     </main>
-    <foot>
-        <p>&copy; 2024 My Statistics Blog</p>
-    </footer>
+    
        <script>        
         let charts= {};
         const values = [1, 2, 3, 4,5]; // Numerical values for mean/variance calculation
@@ -284,8 +350,8 @@
                     datasets: [{
                         label: 'Sample Means Distribution',
                         data: histogram,
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(100, 0, 255, 0.6)',
+                        borderColor: 'rgba(100, 0, 255, 1)',
                         borderWidth: 1
                     }]
                 },
