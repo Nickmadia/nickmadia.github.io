@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frequency Analysis of Caesar Cipher </title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
+    <style>
+        .charts-container {
+            display: flex;
+            margin: 0;
+        }
+        .chart-wrapper {
+            flex: 0;
+        }
+        .flipped-chart {
+            transform: rotate(90deg); /* Flips the chart by 90 degrees clockwise */
+        }  pre {
+            background-color: #f4f4f409; /* Light gray background */
+            padding: 10px; /* Padding for the code */
+            border-radius: 5px; /* Rounded corners */
+            overflow-x: auto; /* Scrollable if too long */
+        }.button-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        button:hover {
+            background-color: #2563eb;
+        }
+        .error {
+            color: #dc2626;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fee2e2;
+            border-radius: 4px;
+            display: none;
+        }
+        .sum-display {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Homework 8</h1>
+    </header>
+
+    <main>
+        <section>
+            <h1>Shannon Entropy and Primitive Roots</h1>
+
+            <div class="theorem">
+                <h2>Shannon Entropy</h2>
+                <p>Shannon Entropy measures the average information content or uncertainty in a probability distribution.</p>
+        
+                <h3>Mathematical Definition</h3>
+                <p>For a discrete random variable X with possible values \(x_i\) and probabilities \(p(x_i)\), the entropy H is defined as:</p>
+                <p>\[H(X) = -\sum_{i} p(x_i) \log_2(p(x_i))\]</p>
+        
+                <h3>Key Properties</h3>
+                <ul>
+                    <li>Measures the average information content</li>
+                    <li>Maximum entropy occurs for uniform distributions</li>
+                    <li>Minimum entropy is 0 for deterministic distributions</li>
+                </ul>
+            </div>
+        
+           
+        
+            <div class="definition">
+                <h2>Primitive Roots</h2>
+                <p>A primitive root modulo p (where p is prime) is a number g with a special multiplicative property.</p>
+        
+                <h3>Formal Definition</h3>
+                <p>A number g is a primitive root modulo p if:</p>
+                <p>\[\forall a \in \{1, 2, ..., p-1\}, \exists k \in \{1, 2, ..., p-1\} : g^k \equiv a \pmod{p}\]</p>
+        
+                <h3>Key Characteristics</h3>
+                <ul>
+                    <li>Generates all non-zero residues modulo p</li>
+                    <li>Exists only for specific prime numbers</li>
+                    <li>Crucial in number theory and cryptography</li>
+                </ul>
+            </div>
+        
+
+          <h1>Practice</h1>
+          <form id="inputForm">
+            <div class="input-group">
+                <label for="plaintext"> text : </label>
+                <textarea name="text" id="plaintext" rows="10" cols="100" placeholder="Enter text here"></textarea>
+              <label for="shift"> shift: </label>
+              <input type="number" id="shift" name="shift" step="1" min="1" max="26" value="5" required><br>
+              <button type="button" onclick="genRandomText()">Generate random text</button>
+              <button type="button" onclick="runSimulation()">Encrypt</button>
+            </div>
+            
+        </form>
+        <div class="card">
+            <h3>ciphertext</h3>
+            <p class="note" id="ciphertext"></p>
+            <h3>calculated shift </h3>
+            <p class="note" id="foundShift"></p>
+        </div>
+  
+          <!-- Charts for visualizing results -->
+              <canvas id="distributionChart" height="300" width="800"> </canvas>
+              <canvas id="letterDistributionChart" height="300" width="800"> </canvas>
+         
+        <h2>Understanding the Caesar Cipher and Its Vulnerability to Frequency Analysis</h2>
+        <p>The Caesar cipher is one of the oldest and simplest encryption techniques. It is a substitution cipher where each letter in the plaintext is substituted by another letter, which is a fixed number of positions down or up the alphabet. Despite its simplicity, it is vulnerable to frequency analysis attacks, especially when applied to large amounts of text.</p>
+        
+        <h3>Why the Caesar Cipher Is Vulnerable to Frequency Analysis</h3>
+        <ul>
+            <li><strong>Preserved Letter Frequencies:</strong> One of the main weaknesses of the Caesar cipher is that it does not alter the relative frequency of letters in the plaintext. This means that if a letter like 'E' appears frequently in the original message, the shifted ciphertext will have the same letter appearing frequently, allowing an attacker to easily identify patterns.</li>
+            <li><strong>Frequency Comparison Attack:</strong> The attacker can perform frequency analysis by comparing the frequency of letters in the ciphertext with known frequency distributions of letters in the target language (for example, English). By identifying which letter in the ciphertext corresponds to the most common letter in the language, they can determine the shift used in the cipher.</li>
+            <li><strong>Low Computational Effort:</strong> Since there are only 25 possible shifts in the English alphabet, breaking the Caesar cipher can be done quickly by simply trying all shifts, a method known as brute-force. In addition, frequency analysis provides a more efficient way of determining the shift by examining the structure of the text.</li>
+        </ul>
+       <h2>The method I used</h2> 
+       <p>I used the Sum of squared differences in order to find the right amount of shift that minimized the differences between the standard english letters distribution and the given cipher text.</p>
+        <h2>Shannon Entropy and Its Role in Cryptography</h2>
+        <p>Shannon entropy is a measure of uncertainty or randomness in a dataset. In cryptography, it provides a way to evaluate how unpredictable a cipher is, based on the distribution of symbols or letters in the encrypted text.</p>
+    
+        <p><strong>Entropy of Plaintext:</strong> In the case of the plaintext, the entropy measures the unpredictability of the content. Texts with more diverse letter frequencies tend to have higher entropy, which means they are harder to predict. The entropy of plaintext can be calculated using the following formula:</p>
+        <pre>Hₚ = - Σ P(x) log₂ P(x)</pre>
+        <p>Where P(x) represents the probability of a specific letter appearing in the plaintext. Higher entropy indicates greater unpredictability in the text.</p>
+    
+        <p><strong>Entropy of Ciphertext:</strong> For a simple substitution cipher like the Caesar cipher, the ciphertext will retain the same frequency distribution as the plaintext, and thus the entropy of the ciphertext will be similar to that of the plaintext. However, in more complex ciphers like RSA, the ciphertext will introduce more randomness, typically resulting in higher entropy and making the ciphertext less predictable.</p>
+    
+        </section>
+    </main>
+    
+       <script>        
+        let charts= {};
+        const apiUrl = "https://en.wikipedia.org/w/api.php";
+
+         // English letter frequencies (approximate percentages)
+         const letterLabels = [
+            "e", "t", "a", "o", "i", "n", "s", "h", "r", "d", 
+            "l", "c", "u", "m", "w", "f", "g", "y", "p", "b", 
+            "v", "k", "j", "x", "q", "z"
+        ];
+        const letterFrequencies = [
+            12.70, 9.06, 8.17, 7.51, 6.97, 6.75, 6.33, 6.09, 5.99, 4.25, 
+            4.03, 2.78, 2.76, 2.41, 2.36, 2.23, 2.02, 1.97, 1.93, 1.49, 
+            0.98, 0.77, 0.15, 0.15, 0.10, 0.07
+        ];
+        const englishLetterFrequency = {
+    a: 8.2, b: 1.5, c: 2.8, d: 4.3, e: 12.7, f: 2.2, g: 2.0, h: 6.1, i: 6.9, j: 0.15,
+    k: 0.8, l: 4.0, m: 2.4, n: 6.7, o: 7.5, p: 1.9, q: 0.1, r: 6.0, s: 6.3, t: 9.1,
+    u: 2.8, v: 1.0, w: 2.4, x: 0.2, y: 2.0, z: 0.1
+};
+
+        const englishDistribution  = getSingleDistribution(letterLabels,letterFrequencies);
+        plotEnglishDistribution();
+        
+        function getSingleDistribution(labels,values) {
+            return labels.map((label, index) => ({ x: label, y: values[index] }));
+        }
+
+        function calculateCaesarShiftByDistribution(englishDist, cipherDist) {
+    const shiftScores = [];
+
+    // Try all possible shifts (0 to 25)
+    for (let shift = 0; shift < 26; shift++) {
+        let rotatedCipherDist = rotateDistribution(cipherDist, shift);
+        let score = calculateDistributionScore(englishDist, rotatedCipherDist);
+        shiftScores.push({ shift: shift, score: score });
+    }
+
+    // Return the shift with the lowest score (best match)
+    let bestShift = shiftScores.reduce((min, current) => (current.score < min.score ? current : min), shiftScores[0]);
+    console.log(bestShift);
+    return 26 - bestShift.shift;
+}
+
+// Rotate the cipher distribution by a given shift
+function rotateDistribution(dist, shift) {
+    const alphabet = "abcdefghijklmnopqrstuvwxyz";
+    let rotatedDist = {};
+
+    // For each letter, shift the position by the given amount
+    for (let letter in dist) {
+        let newPos = (alphabet.indexOf(letter) + shift) % 26;
+        rotatedDist[alphabet[newPos]] = dist[letter];
+    }
+
+    return rotatedDist;
+}
+
+// Calculate the score (sum of squared differences) between two distributions
+function calculateDistributionScore(dist1, dist2) {
+    let score = 0;
+
+    // For each letter, compute the squared difference between its frequency in the two distributions
+    for (let letter in dist1) {
+        if(!dist2[letter]) {
+            continue;
+        }
+        let diff =  dist2[letter] - dist1[letter];
+        
+        score += diff * diff;  // Sum of squared differences
+    }
+
+    return score;
+}
+
+        function getRandomWikipediaText() {
+
+    return new Promise((resolve, reject) => {
+        // Step 1: Fetch a random Wikipedia article title
+        fetch(`${apiUrl}?action=query&format=json&list=random&rnnamespace=0&rnlimit=1&origin=*`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch random article title: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const title = data.query.random[0]?.title;
+                if (!title) {
+                    throw new Error("No title found in the random article response.");
+                }
+
+                // Step 2: Fetch the article content
+                return fetch(`${apiUrl}?action=query&format=json&prop=extracts&titles=${encodeURIComponent(title)}&explaintext=true&origin=*`);
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch article content: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const pages = data.query.pages;
+                const pageId = Object.keys(pages)[0];
+                const text = pages[pageId]?.extract;
+
+                if (!text) {
+                    throw new Error("No extract found in the article content.");
+                }
+
+                // Step 3: Truncate to 500 words
+                const truncatedText = text.split(/\s+/).slice(0, 500).join(" ");
+                resolve(truncatedText);
+            })
+            .catch(error => {
+                // Handle any errors in the chain
+                reject(`Error fetching Wikipedia text: ${error.message}`);
+            });
+    });
+}
+ 
+        function calculateLetterDistribution(text) {
+            const distribution = {};
+            text = text.toLowerCase();
+            let totalLetters = 0; 
+
+            for (const char of text) {
+                if (/[a-z]/.test(char)) { // Only consider alphabetic characters
+                    distribution[char] = (distribution[char] || 0) + 1;
+                    totalLetters++;
+                }
+            }
+
+            // Convert counts to percentages
+                for (const char in distribution) {
+                distribution[char] = (distribution[char] / totalLetters) * 100;
+            }
+
+            return distribution;
+        }
+        function plotEnglishDistribution() {
+              // Create the bar chart
+              englishDistribution.sort((a, b) => a.x.localeCompare(b.x));
+
+        // Step 3: Separate the sorted data back into labels and values
+        const sortedLabels = englishDistribution.map(item => item.x);
+        const sortedValues = englishDistribution.map(item => item.y);
+        const ctx = document.getElementById("letterDistributionChart").getContext("2d");
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                datasets: [{
+                    label: "English Letter Frequency (%)",
+                    data: englishDistribution,
+                    backgroundColor: "rgba(75, 192, 192, 0.2)",
+                    borderColor: "rgba(75, 192, 192, 1)",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: "Frequency (%)"
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: "top"
+                    }
+                }
+            }
+        });
+        }
+        function plotLetterDistribution(distribution) {
+            const ctx = document.getElementById('distributionChart').getContext('2d');
+            const labels = Object.keys(distribution);
+            const values = Object.values(distribution);
+            const sortedDistribution = getSingleDistribution(labels,values);
+
+            sortedDistribution.sort((a,b) => a.x.localeCompare(b.x));
+
+            const sortedLabels = sortedDistribution.map(item => item.x);
+            const sortedValues = sortedDistribution.map(item => item.y);
+            if (charts['distributionChart']){
+                charts['distributionChart'].destroy();
+            } 
+            charts['distributionChart'] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedLabels,
+                    datasets: [{
+                        label: 'Letter Frequency (%)',
+                        data: sortedValues,
+                        backgroundColor: 'rgba(75, 0, 192, 0.2)',
+                        borderColor: 'rgba(75, 0, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%'; // Add '%' to the y-axis labels
+                        }
+                    }
+                        }
+                    }
+                }
+            });
+        }
+
+      function runSimulation() {
+        const text = document.getElementById('plaintext').value;
+        const shift = document.getElementById('shift').value;
+        const ct = caesarCipher(text, shift);
+        document.getElementById('ciphertext').innerText = ct;
+
+        const distribution = calculateLetterDistribution(ct);
+        console.log(distribution);
+            plotLetterDistribution(distribution);
+        document.getElementById('foundShift').innerText = calculateCaesarShiftByDistribution(englishLetterFrequency, distribution);
+    }
+    async function genRandomText(){
+
+            await getRandomWikipediaText()
+                .then(text => {
+                    document.getElementById('plaintext').value = text.toLowerCase();
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+         
+    }
+    function caesarCipher(str, shift) {
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    // Ensure the shift is within 0-25
+    const normalizedShift = ((shift % 26) + 26) % 26;
+
+    // Convert the string to uppercase and process it
+    return str.split("").map(char => {
+        const isLowerCase = char >= 'a' && char <= 'z';
+        const isUpperCase = char >= 'A' && char <= 'Z';
+        const isLetter = isLowerCase || isUpperCase;
+
+        if (isLetter) {
+            const base = isLowerCase ? "a".charCodeAt(0) : "A".charCodeAt(0);
+            const shiftedChar = String.fromCharCode(
+                ((char.charCodeAt(0) - base + normalizedShift) % 26) + base
+            );
+            return shiftedChar;
+        } else {
+            // Non-alphabetic characters remain unchanged
+            return char;
+        }
+    }).join("");
+}
+  function udpateStats(tMean,tVariance,eMean,eVariance) {
+    document.getElementById('mean').textContent = eMean.toFixed(3);
+    document.getElementById('meant').textContent = tMean.toFixed(3);
+    document.getElementById('stdDev').textContent = eVariance.toFixed(3);
+    document.getElementById('stdDevt').textContent = tVariance.toFixed(3);
+  }
+ 
+       </script>
+</body>
+</html>
