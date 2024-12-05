@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Magic of the Central Limit Theorem </title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
+    <style>
+        .charts-container {
+            display: flex;
+            margin: 0;
+        }
+        .chart-wrapper {
+            flex: 0;
+        }
+        .flipped-chart {
+            transform: rotate(90deg); /* Flips the chart by 90 degrees clockwise */
+        }  pre {
+            background-color: #f4f4f409; /* Light gray background */
+            padding: 10px; /* Padding for the code */
+            border-radius: 5px; /* Rounded corners */
+            overflow-x: auto; /* Scrollable if too long */
+        }.button-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        button:hover {
+            background-color: #2563eb;
+        }
+        .error {
+            color: #dc2626;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fee2e2;
+            border-radius: 4px;
+            display: none;
+        }
+        .sum-display {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Homework 9</h1>
+    </header>
+
+    <main>
+        <section>
+          <h1>The Central Limit Theorem: A Sampling Mean, Variance, and the Law of Large Numbers</h1>
+
+          <h2>1. Introduction</h2>
+          <p>
+              Sampling is at the core of statistical inference, allowing us to estimate properties of a population based on smaller subsets of data. Two critical concepts in this domain are the sampling mean and variance. This article explores their main properties, illustrates the law of large numbers, and discusses real-world applications, particularly in cybersecurity.
+          </p>
+          <h2>2. Main Properties of the Sampling Mean and Variance</h2>
+          <h3>2.1 Sampling Mean (\(\bar{X}\))</h3>
+          <p>The sampling mean is the average of sample data points, defined as:</p>
+          <p>
+              \[
+              \bar{X} = \frac{1}{n} \sum_{i=1}^n X_i
+              \]
+          </p>
+          <p>Key properties:</p>
+          <ul>
+              <li><strong>Unbiased Estimator:</strong> The expected value of the sampling mean equals the population mean (\(\mu_X\)):
+                  \[
+                  \mathbb{E}[\bar{X}] = \mu_X
+                  \]
+              </li>
+              <li><strong>Variance:</strong> The variance of the sampling mean decreases with sample size (\(n\)):
+                  \[
+                  \mathrm{Var}(\bar{X}) = \frac{\sigma_X^2}{n}
+                  \]
+                  where \(\sigma_X^2\) is the population variance.
+              </li>
+          </ul>
+          <h3>2.2 Sampling Variance (\(S^2\))</h3>
+          <p>The sampling variance measures variability within a sample and is calculated as:</p>
+          <p>
+              \[
+              S^2 = \frac{1}{n-1} \sum_{i=1}^n (X_i - \bar{X})^2
+              \]
+          </p>
+          <p>Key properties:</p>
+          <ul>
+              <li><strong>Unbiased Estimator:</strong> The expected value of the sample variance equals the population variance:
+                  \[
+                  \mathbb{E}[S^2] = \sigma_X^2
+                  \]
+              </li>
+              <li><strong>Dependence on Sample Size:</strong> Larger samples tend to produce more stable estimates of variance.</li>
+          </ul>
+          <h2>3. The Law of Large Numbers (LLN)</h2>
+          <p>
+              The Law of Large Numbers (LLN) states that as the sample size increases:
+          </p>
+          <ul>
+              <li>The sampling mean (\(\bar{X}\)) converges to the population mean (\(\mu_X\)): 
+                  \[
+                  \lim_{n \to \infty} \bar{X} = \mu_X
+                  \]
+              </li>
+              <li>The sampling variance (\(S^2\)) converges to the population variance (\(\sigma_X^2\)): 
+                  \[
+                  \lim_{n \to \infty} S^2 = \sigma_X^2
+                  \]
+              </li>
+          </ul>
+          <p>This convergence guarantees that statistical estimates become more accurate with larger sample sizes, ensuring reliability in statistical inference.</p>
+          <h2>4. Applications of LLN in Cybersecurity</h2>
+          <h3>4.1 Anomaly Detection</h3>
+          <p>
+              By analyzing a large volume of network traffic, the LLN helps establish a baseline for normal behavior. Deviations from the expected mean or variance can indicate anomalies such as:
+          </p>
+          <ul>
+              <li>Malicious activities</li>
+              <li>System malfunctions</li>
+              <li>Performance degradation</li>
+          </ul>
+          <h3>4.2 Intrusion Detection Systems (IDS)</h3>
+          <p>
+              Intrusion Detection Systems rely on statistical measures derived from network traffic data. The LLN ensures that with sufficient data, these systems can reliably detect deviations indicative of intrusions.
+          </p>
+          <h3>4.3 Risk Assessment</h3>
+          <p>
+              Organizations use variance estimates to assess the stability of security metrics. A low variance in key metrics (e.g., detection rates) suggests a reliable security model, while high variance may indicate vulnerabilities.
+          <h2>5. Conclusion</h2>
+          <p>
+              The sampling mean and variance are foundational tools in statistical analysis, providing insights into population parameters. The Law of Large Numbers underscores their reliability as sample sizes grow, ensuring accurate and stable estimates. In cybersecurity, these concepts enhance anomaly detection, intrusion detection, and risk assessment, contributing to robust and adaptive security systems.
+          </p>
+          <h1>Practice</h1>
+          <form id="inputForm">
+            <div class="input-group">
+  
+              <label for="samples"># samples (n): </label>
+              <input type="number" id="maxSamples" name="samples" min="1" value="3000" required><br>
+              <label for="samplesSize">sample size (m): </label>
+              <input type="number" id="sampleSize" name="samples" min="1" value="500" required><br>
+            </div>
+            <div class="inputs-container">
+              <div class="input-group">
+                <label for="prob1">Probability 1:</label>
+                <input type="number" id="prob1" step="0.0001" min="0" max="1" value="0.1000">
+            </div>
+            <div class="input-group">
+                <label for="prob2">Probability 2:</label>
+                <input type="number" id="prob2" step="0.0001" min="0" max="1" value="0.2000">
+            </div>
+            <div class="input-group">
+                <label for="prob3">Probability 3:</label>
+                <input type="number" id="prob3" step="0.0001" min="0" max="1" value="0.3000">
+            </div>
+            <div class="input-group">
+                <label for="prob4">Probability 4:</label>
+                <input type="number" id="prob4" step="0.0001" min="0" max="1" value="0.1500">
+            </div>
+            <div class="input-group">
+                <label for="prob5">Probability 5:</label>
+                <input type="number" id="prob5" step="0.0001" min="0" max="1" value="0.2500">
+            </div>
+            <div class="button-group">
+                <button type="button" onclick="randomizeProbabilities()">Randomize</button>
+            </div>
+           </div> 
+            <div class="sum-display">Current Sum: <span id="sumDisplay">1.0000</span>
+            </div>
+            <div id="errorMessage" class="error">
+                Probabilities must sum to 1
+            </div>
+            
+            
+  
+              <button type="button" onclick="runSimulation()">Run Simulation</button>
+          </form>
+  
+          <!-- Charts for visualizing results -->
+              <canvas id="distributionChart" height="300" width="800"> </canvas>
+         
+          
+          <!-- Panel for statistical results -->
+          <div class="statistics-container" >
+            <div id="statisticsPanelt" class="centered-div">
+                <h3>Theoretical Stats</h3>
+                <p><strong>Mean:</strong> <span id="meant">N/A</span></p>
+                <p><strong>Variance:</strong> <span id="stdDevt">N/A</span></p>
+            </div>
+              <div id="statisticsPanel" class="centered-div">
+                  <h3>Empirical Stats</h3>
+                  <p><strong>Mean of Variances:</strong> <span id="mean">N/A</span></p>
+                  <p><strong>Variance of Variances:</strong> <span id="stdDev">N/A</span></p>
+              </div>
+          </div>
+          <section>
+            <h2>Theoretical Background</h2>
+            <p>
+                For a population with variance \(\sigma_X^2\), the sample variance (\(S^2\)) is an unbiased estimator, meaning:
+            </p>
+            <p>
+                \[
+                \mathbb{E}[S^2] = \sigma_X^2
+                \]
+            </p>
+            <p>
+                However, the distribution of \(S^2\) is not symmetric and depends on the underlying population distribution. For example, when the parent distribution is normal, \(S^2\) follows a scaled chi-squared distribution with \(n-1\) degrees of freedom:
+            </p>
+            <p>
+                \[
+                S^2 \sim \frac{\sigma_X^2}{n-1} \chi^2_{n-1}
+                \]
+            </p>
+        </section>
+        
+        <section>
+            <h2>Relationship with the Parent Distribution</h2>
+            <p>
+                The observed mean and variance of the sample variances reveal several key relationships with the parent distribution:
+            </p>
+            <ul>
+                <li>
+                    As expected, the mean of the sample variances aligns closely with the population variance (\(\sigma_X^2\)), confirming the theoretical property that \(\mathbb{E}[S^2] = \sigma_X^2\).
+                </li>
+                <li>
+                    The variance of the sample variances (\(\mathrm{Var}(S^2)\)) decreases as the sample size (\(n\)) increases. This behavior is consistent with the chi-squared distribution, where the variability reduces as degrees of freedom increase.
+                </li>
+                <li>
+                    For parent distributions with heavier tails (e.g., exponential or t-distribution), the sample variances show greater variability compared to normal distributions. This is due to the influence of extreme values on the variance calculation.
+                </li>
+            </ul>
+        </section>
+        <section>
+            <h2>Conclusion</h2>
+            <p>
+                The analysis confirms the theoretical relationship between the sample variance distribution and the parent population:
+            </p>
+            <ul>
+                <li>The mean of the sample variances serves as a reliable estimate of the population variance.</li>
+                <li>The variability in sample variances depends on the sample size and the characteristics of the parent distribution.</li>
+            </ul>
+            <p>
+                Understanding these properties is critical for applications where variance estimation is essential, such as in statistical modeling, quality control, and anomaly detection in cybersecurity.
+            </p>
+        </section>
+            <canvas id="meanDistributionChart" width="400" height="200"></canvas>
+            <canvas id="varianceDistributionChart" width="400" height="200"></canvas>
+        </section>
+        </section>
+    </main>
+    
+       <script>        
+        let charts= {};
+        const values = [1, 2, 3, 4,5]; // Numerical values for mean/variance calculation
+        const probabilities = [];
+        let theoreticalMean ;
+        let theoreticalVariance;
+        function getInputValues() {
+          probabilities.length = 0;
+            for (let i = 1; i <= 5; i++) {
+                probabilities.push(parseFloat(document.getElementById(`prob${i}`).value) || 0);
+            }
+          } 
+          function updateSum() {
+            
+            let sum = probabilities.reduce((a, b) => a + b, 0);
+            document.getElementById('sumDisplay').textContent = sum.toFixed(4);
+            
+            const errorElement = document.getElementById('errorMessage');
+            if (Math.abs(sum - 1) > 0.0001) {
+                errorElement.style.display = 'block';
+                return false;
+            } else {
+                errorElement.style.display = 'none';
+                return true;
+            }
+            
+        }
+        function getTheoreticalStats(){
+
+        theoreticalMean = values.reduce((sum, val, i) => sum + val * probabilities[i], 0);
+        theoreticalVariance = values.reduce((sum, val, i) => sum + probabilities[i] * Math.pow(val - theoreticalMean, 2), 0);
+        }
+        function randomizeProbabilities(){
+          const randomNumbers = [];
+            let sum = 0;
+            
+            // Generate random numbers
+            for (let i = 0; i < 5; i++) {
+                const rand = Math.random();
+                randomNumbers.push(rand);
+                sum += rand;
+            }
+            
+            // Normalize to sum to 1
+            for (let i = 0; i < 5; i++) {
+                const normalizedValue = (randomNumbers[i] / sum).toFixed(4);
+                document.getElementById(`prob${i + 1}`).value = normalizedValue;
+            }
+        }
+       function runSimulation() {
+            //const options = acquireOptions(); 
+
+                        // Values and probabilities for the discrete distribution
+
+            // Theoretical mean and variance
+
+            // Generate realizations and track frequencies, mean, variance
+            getInputValues();
+            if (!updateSum()){
+              return
+            }
+            getTheoreticalStats();
+            const realizations = [];
+            const sampleVariances = [];
+            const sampleVariancesStats = new Welford();
+            
+            const maxSamples = parseInt(document.getElementById('maxSamples').value);
+            const sampleSize = parseInt(document.getElementById('sampleSize').value);
+            for (let i = 1; i <= maxSamples; i++) {
+              const statsSample = new Welford();
+              for ( let j = 0; j < sampleSize; j++) {
+                const realization = generateRealization(values, probabilities);
+                realizations.push(realization);
+
+
+                // Update mean and variance using Welford's algorithm
+                statsSample.add(realization);
+              }
+              sampleVariances.push(statsSample.variance());
+                
+            }
+            sampleVariances.forEach(variance => sampleVariancesStats.add(variance));
+            // get stats from sampleVariancesStats.mean
+            udpateStats(theoreticalMean,theoreticalVariance,sampleVariancesStats.mean, sampleVariancesStats.variance());
+            plotDistribution(sampleVariances,maxSamples);
+    }
+  function udpateStats(tMean,tVariance,eMean,eVariance) {
+    document.getElementById('mean').textContent = eMean.toFixed(3);
+    document.getElementById('meant').textContent = tMean.toFixed(3);
+    document.getElementById('stdDev').textContent = eVariance.toFixed(3);
+    document.getElementById('stdDevt').textContent = tVariance.toFixed(3);
+  }
+  // Function to generate random realization based on a given probability distribution
+  function generateRealization(values, probabilities) {
+    const cumulativeProbabilities = [];
+    probabilities.reduce((acc, prob, i) => {
+      cumulativeProbabilities[i] = acc + prob;
+      return cumulativeProbabilities[i];
+    }, 0);
+
+    const rand = Math.random();
+    return values[cumulativeProbabilities.findIndex(cumProb => rand < cumProb)];
+  }
+
+  // Welford's algorithm for mean and variance computation
+  class Welford {
+    constructor() {
+      this.n = 0;
+      this.mean = 0;
+      this.m2 = 0; // Sum of squares of differences from the current mean
+    }
+
+    add(value) {
+      this.n++;
+      const delta = value - this.mean;
+      this.mean += delta / this.n;
+      this.m2 += delta * (value - this.mean);
+    }
+
+    variance() {
+      return this.n > 1 ? this.m2 / (this.n - 1) : 0;
+    }
+  }
+
+  
+
+  function plotDistribution(means, samples) {
+            const bins = 30;
+            const min = Math.min(...means);
+            const max = Math.max(...means);
+            const histogram = new Array(bins).fill(0);
+            const binEdges = Array.from({length: bins + 1}, (_, i) => 
+            min + (max - min) * i / bins
+          );
+          
+          means.forEach(mean => {
+            const binIndex = Math.floor((mean - min) / (max - min) * bins);
+            histogram[Math.min(binIndex, bins - 1)]++;
+          });
+          
+          // Destroy previous chart if it exists
+          if (charts['distributionChart']){
+                      charts['distributionChart'].destroy();
+                  } 
+
+            const ctx = document.getElementById('distributionChart').getContext('2d');
+            charts['distributionChart'] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: binEdges.slice(0, -1).map(edge => edge.toFixed(2)),
+                    datasets: [{
+                        label: 'Sample Means Distribution',
+                        data: histogram,
+                        backgroundColor: 'rgba(100, 0, 255, 0.6)',
+                        borderColor: 'rgba(100, 0, 255, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Sample Mean'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Frequency'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+  
+        function acquireOptions(){
+            return  {
+            servers : parseInt(document.getElementById('servers').value),
+            attackers: parseInt(document.getElementById('attackers').value),
+            p : parseFloat(document.getElementById('probability').value),
+            t : parseInt(document.getElementById('time').value),
+            type : parseInt(document.getElementById('typeSelector').value)
+            }
+        }
+        function welford(arr) {
+         let mean = 0;
+         let M2 = 0; 
+         let N = 0; 
+ 
+         for (let x of arr) {
+             N += 1;
+             const delta = x - mean;
+             mean += delta / N;
+             M2 += delta * (x - mean);
+         }
+ 
+         const variance = N > 1 ? M2 / (N -1  ) : 0; // Sample variance; use N for population variance
+         const standardDeviation = Math.sqrt(variance);
+ 
+         return {
+             mean: mean,
+             variance: variance,
+             standardDeviation: standardDeviation,
+         };
+ }      
+        function welfordRecursive  ([x, ...xs], n = 0, mean = x, m2 = 0) { 
+            return x === undefined
+                ? { mean, variance: n > 1 ? m2 / (n - 1) : 0 }
+                : welfordRecursive(xs, n + 1, mean + (x - mean) / (n + 1), m2 + (x - mean) * (x - mean + (x - mean) / (n + 1)));
+        }   
+
+ 
+        function calculateMode(arr) {
+            const frequencyMap = {};
+            arr.forEach(value => {
+                if (frequencyMap[value]) {
+                    frequencyMap[value]++;
+                } else {
+                    frequencyMap[value] = 1;
+                }
+            });
+ 
+            let mode = null;
+            let maxCount = 0;
+            for (const [key, value] of Object.entries(frequencyMap)) {
+                if (value > maxCount) {
+                    maxCount = value;
+                    mode = key;
+                }
+            }
+            return mode;
+        }
+       </script>
+</body>
+</html>
