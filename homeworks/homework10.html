@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lebesgue vs Riemann Integral</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
+    <style>
+        .charts-container {
+            display: flex;
+            margin: 0;
+        }
+        .chart-wrapper {
+            flex: 0;
+        }
+        .flipped-chart {
+            transform: rotate(90deg); /* Flips the chart by 90 degrees clockwise */
+        }  pre {
+            background-color: #f4f4f409; /* Light gray background */
+            padding: 10px; /* Padding for the code */
+            border-radius: 5px; /* Rounded corners */
+            overflow-x: auto; /* Scrollable if too long */
+        }.button-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        button:hover {
+            background-color: #2563eb;
+        }
+        .error {
+            color: #dc2626;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fee2e2;
+            border-radius: 4px;
+            display: none;
+        }
+        .sum-display {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Homework 10</h1>
+    </header>
+
+    <main>
+        <section>
+            
+            
+            <!-- First Subtitle: General Concepts of Sampling Mean and Variance -->
+            <h2>     General Concepts of Sampling Mean and Variance</h2>
+            <p>
+                When we talk about the sampling mean and sampling variance, we’re focusing on understanding how samples drawn from a population behave in terms of their average (mean) and their spread (variance).
+            </p>
+            <p>
+                <strong>1. Population vs. Sample:</strong><br>
+                <em>Population:</em> The entire set of data points you're interested in (e.g., heights of all adults in a city).<br>
+                <em>Sample:</em> A smaller subset drawn from the population (e.g., heights of 100 adults selected randomly).<br>
+                When you draw a sample, you compute:
+            </p>
+            <ul>
+                <li>The sample mean (\(\bar{X}\)): the average of your sample.</li>
+                <li>The sample variance (\(S^2\)): a measure of how spread out your sample values are around the mean.</li>
+            </ul>
+            <p>
+                These quantities are estimates of the true population mean (\(\mu\)) and population variance (\(\sigma^2\)).
+            </p>
+            <p>
+                <strong>2. Sampling Mean:</strong><br>
+                The sample mean is calculated as:
+            </p>
+            <p>
+                \[
+                \bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
+                \]
+            </p>
+            <p>
+                where \(X_1, X_2, \ldots, X_n\) are your sample values, and \(n\) is the sample size.
+            </p>
+            <p>
+                <strong>Key Features of the Sampling Mean:</strong><br>
+                <em>Expected Value:</em> The sample mean is an unbiased estimator of the population mean:
+            </p>
+            <p>
+                \[
+                E[\bar{X}] = \mu
+                \]
+            </p>
+            <p>
+                <em>Variance:</em> The variance of the sample mean decreases as the sample size increases:
+            </p>
+            <p>
+                \[
+                \text{Var}(\bar{X}) = \frac{\sigma^2}{n}
+                \]
+            </p>
+            <p>
+                Larger samples give more accurate estimates of the mean.
+            </p>
+            <p>
+                <em>Distribution:</em>
+            </p>
+            <ul>
+                <li>If the population follows a normal distribution, the sample mean also follows a normal distribution.</li>
+                <li>If the population is not normal, the Central Limit Theorem tells us that \(\bar{X}\) will approximate a normal distribution as \(n\) increases.</li>
+            </ul>
+            <p>
+                <strong>3. Sampling Variance:</strong><br>
+                The sample variance is calculated as:
+            </p>
+            <p>
+                \[
+                S^2 = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})^2
+                \]
+            </p>
+            <p>
+                This is a measure of how spread out the sample data is around the sample mean.
+            </p>
+            <p>
+                <strong>Key Features of the Sampling Variance:</strong><br>
+                <em>Expected Value:</em> The sample variance is an unbiased estimator of the population variance:
+            </p>
+            <p>
+                \[
+                E[S^2] = \sigma^2
+                \]
+            </p>
+            <p>
+                <em>Distribution:</em>
+            </p>
+            <ul>
+                <li>The sampling variance does not follow a normal distribution. Instead, it follows a chi-squared distribution when the population is normal.</li>
+                <li>Specifically:
+                \[
+                \frac{(n-1)S^2}{\sigma^2} \sim \chi^2(n-1)
+                \]
+                This means the variance’s distribution depends on the sample size (\(n\)).
+                </li>
+            </ul>
+            <p>
+                <strong>4. Main Features of Their Distributions:</strong><br>
+                <em>Sampling Mean Distribution:</em>
+            </p>
+            <ul>
+                <li>Centered around the population mean (\(\mu\)).</li>
+                <li>Spread (standard deviation) shrinks as \(n\) increases:
+                \[
+                \text{SD}(\bar{X}) = \frac{\sigma}{\sqrt{n}}
+                \]
+                </li>
+                <li>Approximates a normal distribution for large \(n\) (Central Limit Theorem).</li>
+            </ul>
+            <p>
+                <em>Sampling Variance Distribution:</em>
+            </p>
+            <ul>
+                <li>Follows a chi-squared distribution (scaled by the population variance).</li>
+                <li>Becomes more concentrated around \(\sigma^2\) as \(n\) increases.</li>
+            </ul>
+            <p>
+                <strong>5. Central Limit Theorem (CLT): Why It’s Important:</strong><br>
+                The CLT states that, regardless of the population’s distribution, the sampling mean will be approximately normally distributed if the sample size is large enough. This is why we often assume normality in statistics when dealing with large samples.
+            </p>
+            <p>
+                <strong>6. Practical Implications:</strong><br>
+                <em>Reliability:</em>
+            </p>
+            <ul>
+                <li>The mean is more reliable than the variance with small samples because its distribution is more predictable (normal or close to normal).</li>
+                <li>Variance estimates are less reliable with small samples because the chi-squared distribution is highly skewed for small \(n\).</li>
+            </ul>
+            <p>
+                <em>Confidence Intervals:</em>
+            </p>
+            <ul>
+                <li>You can construct confidence intervals for the mean using the sampling distribution:
+                \[
+                \bar{X} \pm Z \cdot \frac{\sigma}{\sqrt{n}}
+                \]
+                </li>
+                <li>For variance, intervals are based on the chi-squared distribution.</li>
+            </ul>
+        
+            <!-- Second Subtitle: General Idea of Lebesgue–Stieltjes Integration -->
+            <h2 >General Idea of Lebesgue–Stieltjes Integration</h2>
+            <p>
+                The Lebesgue–Stieltjes integral is a generalization of the Lebesgue integral that incorporates a weighting function. It is useful for dealing with cases where integration depends on changes in a function (like a cumulative distribution function, or CDF, in probability theory).
+            </p>
+            <p>
+                <strong>1. Why Generalize the Lebesgue Integral?</strong><br>
+                The classic Lebesgue integral sums the values of a function over sets of inputs grouped by their function value (slicing horizontally). But sometimes, you want to weight the importance of different parts of the domain based on a function \(g(x)\), called a distribution function or weighting function.
+            </p>
+            <p>
+                The Lebesgue–Stieltjes integral integrates a function \(f(x)\) with respect to another function \(g(x)\) (rather than \(x\)), allowing it to handle more complex relationships between variables.
+            </p>
+            <p>
+                <strong>2. Definition</strong><br>
+                The Lebesgue–Stieltjes integral of \(f(x)\) with respect to \(g(x)\) is written as:
+            </p>
+            <p>
+                \[
+                \int f(x) \, dg(x)
+                \]
+            </p>
+            <p>
+                Here’s what’s happening:
+            </p>
+            <ul>
+                <li>\(f(x)\): the function you’re integrating.</li>
+                <li>\(g(x)\): a monotonically increasing function representing the weighting or distribution.</li>
+            </ul>
+            <p>
+                This setup accommodates cases where \(g(x)\) might not be smooth (e.g., jumps or plateaus), allowing the integral to adapt to the underlying structure of \(g(x)\).
+            </p>
+            <p>
+                <strong>3. Key Idea in Simple Terms</strong><br>
+                Imagine you're summing \(f(x)\), but instead of equal steps (\(dx\)), the step sizes are dictated by \(g(x)\). If \(g(x)\) grows slowly, you add less weight; if \(g(x)\) jumps, you add more weight.
+            </p>
+            <h2 >Applications</h2>
+            <p>
+                <strong>1. In Probability Theory</strong><br>
+                The Lebesgue–Stieltjes integral is critical because:
+            </p>
+            <ul>
+                <li>Probability distributions are defined by their CDFs (\(F(x)\)), which are often non-smooth or piecewise.</li>
+                <li>For a random variable \(X\) with CDF \(F(x)\), the expected value can be written as:
+                \[
+                E[X] = \int x \, dF(x)
+                \]
+                </li>
+                <li>It works seamlessly for both discrete and continuous distributions, as \(F(x)\) captures all probabilities.</li>
+            </ul>
+            <p>
+                <strong>Example:</strong><br>
+                For a discrete random variable, \(F(x)\) jumps at specific points (probabilities), and the integral captures these jumps.<br>
+                For a continuous random variable, \(F(x)\) is smooth, and the integral reduces to the usual Lebesgue form.
+            </p>
+            <p>
+                <strong>2. In Measure Theory</strong><br>
+                The Lebesgue–Stieltjes integral connects functions with measures. A measure assigns a "size" or "weight" to subsets of a space.
+            </p>
+            <p>
+                If \(g(x)\) is a CDF, its derivative \(f(x)\) (when it exists) is the probability density function (PDF). The integral then bridges the gap between density functions and measures.
+            </p>
+        </div>
+          <h1>Practice</h1>
+          <form id="inputForm">
+            <div class="input-group">
+  
+                
+              <label for="intervalSize">intervals for numerical computation (n): </label>
+              <input type="number" id="intervals" name="samples" min="1" value="250" required><br>
+              <label for="intervalA">Lower Limit (a): </label>
+              <input type="number" id="a" name="samples" min="1" value="-2" required><br>
+              <label for="samplesSize">Upper Limit (b): </label>
+              <input type="number" id="b" name="samples" min="1" value="2" required><br>
+            </div>
+            <div class="inputs-container">
+              
+           </div> 
+  
+              <button type="button" onclick="runSimulation()">Compute</button>
+          </form>
+  
+          <!-- Charts for visualizing results -->
+              <canvas id="riemannGraph" height="300" width="800"> </canvas>
+            <canvas id="integralGraph" width="400" height="200"></canvas>
+          
+          <!-- Panel for statistical results -->
+          <div class="statistics-container" >
+            <div id="statisticsPanelt" class="centered-div">
+                <h3>Riemann Integral</h3>
+                <p><strong> <div class="formula">
+                    \[ \int_{a}^{b} f(x) dx \approx \sum_{i=0}^{n} f(x_i) \Delta x \]
+                </div>: <span id="meant">N/A</span></strong> </p>
+            </div>
+              <div id="statisticsPanel" class="centered-div">
+                  <h3>Lebesgue Integral</h3>
+                  <p><strong><div class="formula">
+                    \[ \int_{a}^{b} f(x) dx = \int_{0}^{\infty} \text{measure}\{x \in [a,b] : f(x) > y\} dy \] : <span id="mean">N/A</span></strong>
+                </div> </p>
+              </div>
+          </div>
+            
+        </section>
+        </section>
+    </main>
+    
+       <script>        
+        let charts= {};
+        
+    function runSimulation() {
+
+        const options = acquireOptions(); 
+        
+    const intervals = options.intervals; 
+    // Gaussian function (standard normal distribution)
+    const gaussianFunction = (x) => (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * x * x);
+
+    const f = gaussianFunction;
+    // Riemann sum computation
+    let riemannSum = 0;
+    let lebesgueSum = 0;
+    const riemannData = [];
+    const deltaX = (options.b - options.a) / intervals;
+    for (let i = 0; i < intervals; i++) {
+        const x = options.a + (i ) * deltaX + (deltaX/2);
+        riemannSum += f(x) * deltaX;
+       riemannData.push({
+                y :f(x) * deltaX,
+                x : x});
+    }
+
+    // Lebesgue integral computation
+    const lebesgueIntervals = [];
+    
+    // Determine the range of function values
+    const yMin = 0;
+    const yMax = f(0); // Maximum value of the function at x=0
+
+    // Compute Lebesgue measure
+    function computeLebesgueMeasure(y0, y1, a, b, n) {
+        const deltaX = (options.b - options.a) / n;
+        let measure = 0;
+        for (let i = 0; i < n; i++) {
+            const x = options.a + i * deltaX;
+            const y = f(x);
+            if (y >= y0 ) {
+                measure += deltaX;
+            }
+        }
+        return measure;
+    }
+
+    // Calculate intervals for Lebesgue integral (partitioning y-axis)
+    for (let i = 0; i < intervals; i++) {
+        const y0 = yMin + (i * (yMax - yMin)) / intervals;
+        const y1 = yMin + ((i + 1) * (yMax - yMin)) / intervals;
+        const measure = computeLebesgueMeasure(y0, y1, options.a, options.b, intervals);
+        lebesgueSum += (y1 - y0) * measure; 
+        lebesgueIntervals.push({
+            lower: y0,
+            upper: y1,
+            value: (y1 - y0) * measure, // integrate y * measure(set)
+            count: measure
+        });
+    }
+
+    // Compute Lebesgue integral sum
+    //const lebesgueSum = lebesgueIntervals.reduce((sum, interval) => sum + interval.value, 0);
+    console.log('Riemann Sum:', riemannSum);
+    console.log('Lebesgue Sum:', lebesgueSum);
+    plot(lebesgueIntervals,riemannData);
+    udpateStats(riemannSum,lebesgueSum);
+    }
+  function udpateStats(riemann, lebesgue) {
+    document.getElementById('mean').textContent = riemann.toFixed(5);
+    document.getElementById('meant').textContent = lebesgue.toFixed(5);
+  }
+  
+
+  
+        function acquireOptions(){
+            return  {
+            intervals: parseInt(document.getElementById('intervals').value),
+            a: parseInt(document.getElementById('a').value),
+            b : parseFloat(document.getElementById('b').value),
+            }
+        }
+      
+    function plot(lebesgueIntervals, riemann){
+        if(charts['lebesgue']){
+                charts['lebesgue'].destroy(); 
+            }
+            // Update graph
+            const ctx = document.getElementById('integralGraph').getContext('2d');
+            charts['lebesgue'] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: lebesgueIntervals.map(x => x.lower.toFixed(4)),
+                    datasets: [
+                        {
+                            label: 'Measure per Function Value (Lebesgue)',
+                            data: lebesgueIntervals.map(y => y.value),
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Function Value (y)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Measure (x-range covered)'
+                            }
+                        }
+                    }
+                }
+            });
+        
+            if(charts['riemann']){
+                charts['riemann'].destroy(); 
+            }
+            // Update graph
+            const ctx1 = document.getElementById('riemannGraph').getContext('2d');
+            charts['riemann'] = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: riemann.map(x => x.x.toFixed(4)),
+                    datasets: [
+                        {
+                            label: 'Measure per Function Value (Riemann)',
+                            data: riemann.map(y => y.y),
+                            backgroundColor: 'rgba(183, 102, 255, 0.2)',
+                            borderColor: 'rgba(183, 102, 255, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'X-range areas'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Y axis'
+                            }
+                        }
+                    }
+                }
+            });
+    }
+       </script>
+</body>
+</html>
